@@ -28,6 +28,7 @@ services:
       SFTP_PORT: "2022"
       SLICES_ENABLE: ${SLICES_ENABLE:-1}
       SLICES_PORT: "8766"
+      SLICES_PUBLIC_URL: ${SLICES_PUBLIC_URL:?Set SLICES_PUBLIC_URL to the externally reachable HTTPS URL}
       OFFLINE_AUTO_CLEANUP: "1"
       COLD_STORAGE_TYPE: s3
       S3_ENDPOINT: http://minio:9000

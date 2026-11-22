@@ -318,3 +318,8 @@ MIT
 cd mydrive
 python3 pikpak_halal_test.py   # 35 项全功能自动化验收测试
 ```
+
+
+## 生产部署
+
+生产环境请使用 [单机生产部署指南](docs/production-deployment.md) 和 `deploy/docker-compose.production.yml`。现有多实例 PostgreSQL 配置仍为实验性，尚未通过完整的数据一致性验证。

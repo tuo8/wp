@@ -23,7 +23,7 @@ cp .env.production.example .env.production
 docker compose --env-file .env.production -f docker-compose.production.yml up -d --build
 ```
 
-The API, Slices, and optional SFTP ports bind to `PUBLIC_BIND_IP` (default `127.0.0.1`). Put a maintained TLS reverse proxy in front of the API before public exposure. MinIO ports are internal to the Compose network and are not published to the host.
+The API, Slices, and optional SFTP ports bind to `PUBLIC_BIND_IP` (default `127.0.0.1`). Set `SLICES_PUBLIC_URL` to the HTTPS URL clients can reach. Put a maintained TLS reverse proxy in front of both the API and Slices endpoints before public exposure. MinIO ports are internal to the Compose network and are not published to the host.
 
 ## 3. Important runtime settings
 
