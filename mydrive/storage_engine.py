@@ -693,13 +693,13 @@ class StorageEngine:
 
         if primary:
             # Migrate an existing local copy lazily, preserving its on-disk encoding.
+            stored_fmt = int(fmt)
             if chunk_path.exists():
                 encoded = chunk_path.read_bytes()
-                existing_fmt = self.chunk_format(cid)
-                compressed = encoded.startswith(b"MZLB") and existing_fmt == CHUNK_FMT_PLAIN
-                raw_size = len(data)
+                stored_fmt = self.chunk_format(cid)
+                compressed = encoded.startswith(b"MZLB") and stored_fmt == CHUNK_FMT_PLAIN
                 if not self.tiered.store_primary_chunk(
-                    cid, encoded, raw_size=raw_size, compressed=compressed
+                    cid, encoded, raw_size=len(data), compressed=compressed
                 ):
                     raise RuntimeError(f"Primary remote persistence failed for chunk {cid}")
                 try:
@@ -707,9 +707,9 @@ class StorageEngine:
                 except OSError as exc:
                     raise RuntimeError(f"Remote copy verified but local cache eviction failed for {cid}") from exc
             else:
-                encoded = encode_chunk(data, fmt)
+                encoded = encode_chunk(data, stored_fmt)
                 compressed = False
-                if fmt == CHUNK_FMT_PLAIN and self.tiered.compression_enabled:
+                if stored_fmt == CHUNK_FMT_PLAIN and self.tiered.compression_enabled:
                     encoded, compressed = smart_compress(encoded)
                 if not self.tiered.store_primary_chunk(
                     cid, encoded, raw_size=len(data), compressed=compressed
@@ -723,12 +723,12 @@ class StorageEngine:
                     "INSERT INTO chunks (cid, size, ref_count, create_ts, inline_data, format) "
                     "VALUES (?, ?, 1, ?, NULL, ?) "
                     "ON CONFLICT(cid) DO UPDATE SET size=excluded.size, format=excluded.format",
-                    (cid, len(data), int(time.time()), int(fmt)),
+                    (cid, len(data), int(time.time()), stored_fmt),
                 )
                 conn.commit()
             finally:
                 conn.close()
-            self._fmt_cache[cid] = int(fmt)
+            self._fmt_cache[cid] = stored_fmt
             return
 
         # Legacy hot-local / optional cold-tier behavior remains unchanged.
