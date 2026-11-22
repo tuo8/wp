@@ -265,6 +265,14 @@ class DatabaseAdapterTests(unittest.TestCase):
         self.assertIn("information_schema.columns", raw.sql)
         self.assertEqual(raw.params, ("files",))
 
+    def test_sqlite_integer_columns_map_to_postgres_bigint(self):
+        sql = translate_sql_to_pg(
+            "CREATE TABLE quota_test (id INTEGER PRIMARY KEY AUTOINCREMENT, bytes_quota INTEGER, updated_ms INTEGER)"
+        )
+        self.assertIn("id BIGSERIAL PRIMARY KEY", sql)
+        self.assertIn("bytes_quota BIGINT", sql)
+        self.assertIn("updated_ms BIGINT", sql)
+
     def test_sqlite_insert_ignore_translation_remains_supported(self):
         sql = translate_sql_to_pg("INSERT OR IGNORE INTO test_table (id) VALUES (?)")
         self.assertIn("ON CONFLICT DO NOTHING", sql)

@@ -25,6 +25,9 @@ def translate_sql_to_pg(sql: str) -> str:
     out = sql
     # 1. DDL normalizations
     out = re.sub(r"\bINTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT\b", "BIGSERIAL PRIMARY KEY", out, flags=re.I)
+    # SQLite INTEGER is signed 64-bit; PostgreSQL INTEGER is only 32-bit.
+    # Use BIGINT for all remaining INTEGER columns to preserve quotas, sizes, and millisecond timestamps.
+    out = re.sub(r"\bINTEGER\b", "BIGINT", out, flags=re.I)
     out = re.sub(r"\bBLOB\b", "BYTEA", out, flags=re.I)
 
     # 2. INSERT OR IGNORE -> INSERT ... ON CONFLICT DO NOTHING
