@@ -35,6 +35,7 @@ import hmac
 import json
 import os
 import sqlite3
+from db_adapter import connect_db
 import threading
 import time
 import urllib.parse
@@ -382,7 +383,7 @@ class TieredStorageManager:
             self.backend = None
 
     def _init_db(self):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("""
             CREATE TABLE IF NOT EXISTS chunk_tiers (
@@ -415,7 +416,7 @@ class TieredStorageManager:
     def record_chunk_stored(self, cid: str, raw_size: int, stored_size: int, compressed: bool,
                             stored_sha256: str = ""):
         now = int(time.time())
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
             """
@@ -440,7 +441,7 @@ class TieredStorageManager:
 
     def touch(self, cid: str):
         now = int(time.time())
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("UPDATE chunk_tiers SET last_access_ts = ? WHERE cid = ?", (now, cid))
         conn.commit()
@@ -454,7 +455,7 @@ class TieredStorageManager:
             raw = self.backend.get_chunk(self._cold_key(cid))
             if raw is None:
                 return None
-            conn = sqlite3.connect(str(self.db_path))
+            conn = connect_db(self.db_path)
             c = conn.cursor()
             c.execute("SELECT stored_size, stored_sha256 FROM chunk_tiers WHERE cid = ?", (cid,))
             row = c.fetchone()
@@ -481,7 +482,7 @@ class TieredStorageManager:
                     except OSError:
                         pass
             now = int(time.time())
-            conn = sqlite3.connect(str(self.db_path))
+            conn = connect_db(self.db_path)
             conn.execute(
                 "UPDATE chunk_tiers SET in_local = 1, last_access_ts = ? WHERE cid = ?",
                 (now, cid),
@@ -512,7 +513,7 @@ class TieredStorageManager:
                 return False
 
             now = int(time.time())
-            conn = sqlite3.connect(str(self.db_path))
+            conn = connect_db(self.db_path)
             c = conn.cursor()
             c.execute(
                 """INSERT INTO chunk_tiers
@@ -532,7 +533,7 @@ class TieredStorageManager:
                 except OSError:
                     # Both copies remain; the DB already records the verified cold copy.
                     return True
-                conn = sqlite3.connect(str(self.db_path))
+                conn = connect_db(self.db_path)
                 conn.execute("UPDATE chunk_tiers SET in_local = 0 WHERE cid = ?", (cid,))
                 conn.commit()
                 conn.close()
@@ -549,7 +550,7 @@ class TieredStorageManager:
             if local_bytes <= max_bytes:
                 return {"offloaded": 0, "freed_bytes": 0, "local_bytes": local_bytes}
 
-            conn = sqlite3.connect(str(self.db_path))
+            conn = connect_db(self.db_path)
             c = conn.cursor()
             c.execute(
                 "SELECT cid, stored_size FROM chunk_tiers "
@@ -577,7 +578,7 @@ class TieredStorageManager:
         """Manually push all local chunks to cold storage to free local disk."""
         if not self.backend:
             return {"offloaded": 0, "freed_bytes": 0, "error": "Cold storage backend not configured"}
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT cid FROM chunk_tiers WHERE in_local = 1")
         cids = [r[0] for r in c.fetchall()]
@@ -617,7 +618,7 @@ class TieredStorageManager:
                 except Exception:
                     # Keep tier metadata so a failed remote delete can be retried.
                     return freed
-            conn = sqlite3.connect(str(self.db_path))
+            conn = connect_db(self.db_path)
             c = conn.cursor()
             c.execute("DELETE FROM chunk_tiers WHERE cid = ?", (cid,))
             conn.commit()
@@ -636,7 +637,7 @@ class TieredStorageManager:
         return total
 
     def get_stats(self) -> dict:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
             "SELECT COUNT(*), COALESCE(SUM(raw_size),0), COALESCE(SUM(stored_size),0), "

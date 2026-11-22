@@ -11,6 +11,7 @@ from offline_engine import _validate_download_url
 from share_manager import ShareManager
 from tiered_storage import TieredStorageManager
 from commercial_manager import CommercialManager
+from db_adapter import PgCursorWrapper, translate_sql_to_pg
 
 
 class AuthSecurityTests(unittest.TestCase):
@@ -186,6 +187,38 @@ class CommercialStateTests(unittest.TestCase):
             list(pool.map(lambda _: self.manager.set_membership("buyer-1", "vip", 1), range(5)))
         expiry = self.manager.get_membership("buyer-1")["expire_ts"]
         self.assertGreaterEqual(expiry, int(__import__("time").time()) + 4 * 86400)
+
+
+class _FakePgCursor:
+    def __init__(self):
+        self.description = [("cid",), ("name",), ("type",), ("not_null",), ("dflt_value",), ("pk",)]
+        self.rowcount = 0
+        self.sql = ""
+        self.params = None
+    def execute(self, sql, params=None):
+        self.sql, self.params = sql, params
+        return self
+    def fetchall(self):
+        return [(0, "identity", "text", 1, None, 1)]
+    def fetchone(self):
+        rows = self.fetchall()
+        return rows[0] if rows else None
+
+
+class DatabaseAdapterTests(unittest.TestCase):
+    def test_pragma_table_info_is_emulated_for_postgres(self):
+        raw = _FakePgCursor()
+        cursor = PgCursorWrapper(raw)
+        cursor.execute("PRAGMA table_info(files)")
+        row = cursor.fetchone()
+        self.assertEqual(row[1], "identity")
+        self.assertIn("information_schema.columns", raw.sql)
+        self.assertEqual(raw.params, ("files",))
+
+    def test_sqlite_insert_ignore_translation_remains_supported(self):
+        sql = translate_sql_to_pg("INSERT OR IGNORE INTO test_table (id) VALUES (?)")
+        self.assertIn("ON CONFLICT DO NOTHING", sql)
+        self.assertIn("%s", sql)
 
 
 class OfflineSSRFTests(unittest.TestCase):

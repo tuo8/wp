@@ -1220,10 +1220,18 @@ class StorageEngine:
         conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
-            "INSERT OR REPLACE INTO files (identity, parent, name, path, size, mime_type, "
+            "INSERT INTO files (identity, parent, name, path, size, mime_type, "
             "is_dir, content_identity, store_type, create_ts, update_ts, deleted, trashed, shared, version, user_id, "
             "type, sort_name, delete_ts, hidden, starred, locked, nodes, desc_files, desc_dirs) "
-            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+            "VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?) "
+            "ON CONFLICT(identity) DO UPDATE SET parent=excluded.parent, name=excluded.name, path=excluded.path, "
+            "size=excluded.size, mime_type=excluded.mime_type, is_dir=excluded.is_dir, "
+            "content_identity=excluded.content_identity, store_type=excluded.store_type, "
+            "create_ts=excluded.create_ts, update_ts=excluded.update_ts, deleted=excluded.deleted, "
+            "trashed=excluded.trashed, shared=excluded.shared, version=excluded.version, user_id=excluded.user_id, "
+            "type=excluded.type, sort_name=excluded.sort_name, delete_ts=excluded.delete_ts, "
+            "hidden=excluded.hidden, starred=excluded.starred, locked=excluded.locked, "
+            "nodes=excluded.nodes, desc_files=excluded.desc_files, desc_dirs=excluded.desc_dirs",
             (meta.identity, meta.parent, meta.name, meta.path, meta.size,
              meta.mime_type, int(meta.is_dir), meta.content_identity, meta.store_type,
              meta.create_ts, meta.update_ts, int(meta.deleted), int(meta.trashed),
@@ -1231,10 +1239,11 @@ class StorageEngine:
              meta.type, meta.sort_name, meta.delete_ts, int(meta.hidden),
              int(meta.starred), int(meta.locked), meta.nodes, meta.files, meta.directories)
         )
-        # Insert chunk mappings
+        # Replace the mapping set as a whole so stale trailing chunk rows cannot survive updates.
+        c.execute("DELETE FROM file_chunks WHERE file_identity = ?", (meta.identity,))
         for chunk in meta.chunks:
             c.execute(
-                "INSERT OR REPLACE INTO file_chunks (file_identity, chunk_index, cid, start_byte, end_byte, size) "
+                "INSERT INTO file_chunks (file_identity, chunk_index, cid, start_byte, end_byte, size) "
                 "VALUES (?, ?, ?, ?, ?, ?)",
                 (meta.identity, chunk.index, chunk.cid, chunk.start, chunk.end, chunk.size)
             )
@@ -1444,10 +1453,11 @@ class StorageEngine:
         c = conn.cursor()
         c.execute(
             "INSERT INTO file_versions (file_identity, version, content_identity, size, chunks_json, create_ts, note) "
-            "VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING id",
             (meta.identity, meta.version, meta.content_identity, meta.size, chunks_json, ts, note),
         )
-        vid = c.lastrowid
+        inserted = c.fetchone()
+        vid = inserted[0] if inserted else None
         conn.commit()
         conn.close()
         return {"id": vid, "file_identity": meta.identity, "version": meta.version,

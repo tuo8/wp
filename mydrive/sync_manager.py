@@ -27,6 +27,7 @@ import uuid
 import json
 import hashlib
 import sqlite3
+from db_adapter import connect_db
 from pathlib import Path
 from typing import Optional, List
 
@@ -41,7 +42,7 @@ class SyncManager:
         self._init_db()
 
     def _init_db(self):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("""
             CREATE TABLE IF NOT EXISTS sync_pairs (
@@ -85,7 +86,7 @@ class SyncManager:
         pair_id = uuid.uuid4().hex[:12]
         now = int(time.time())
 
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
             "INSERT INTO sync_pairs (id, local_path, cloud_parent, direction, created_ts, user_id) "
@@ -99,7 +100,7 @@ class SyncManager:
                 "cloud_parent": cloud_parent, "direction": direction}
 
     def list_pairs(self, user_id: str = None) -> list:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         query = ("SELECT id, local_path, cloud_parent, direction, last_sync_ts, status, created_ts "
                  "FROM sync_pairs")
@@ -119,7 +120,7 @@ class SyncManager:
         ]
 
     def delete_pair(self, pair_id: str, user_id: str = None):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         if user_id is None:
             c.execute("DELETE FROM sync_pairs WHERE id = ?", (pair_id,))
@@ -130,7 +131,7 @@ class SyncManager:
         conn.close()
 
     def sync_pair(self, pair_id: str, user_id: str = None) -> dict:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         query = "SELECT local_path, cloud_parent, direction, last_sync_ts FROM sync_pairs WHERE id = ?"
         params = [pair_id]
@@ -238,7 +239,7 @@ class SyncManager:
                 results["errors"] += 1
 
     def _get_sync_record(self, pair_id: str, rel_path: str) -> dict:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT file_identity, local_mtime, local_size, sha1, last_sync_ts "
                   "FROM sync_records WHERE pair_id = ? AND local_rel_path = ?", (pair_id, rel_path))
@@ -251,18 +252,21 @@ class SyncManager:
 
     def _upsert_sync_record(self, pair_id: str, rel_path: str, file_identity: str,
                             mtime: int, size: int, sha1: str):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
-            "INSERT OR REPLACE INTO sync_records (pair_id, local_rel_path, file_identity, "
-            "local_mtime, local_size, sha1, last_sync_ts) VALUES (?, ?, ?, ?, ?, ?, ?)",
+            "INSERT INTO sync_records (pair_id, local_rel_path, file_identity, "
+            "local_mtime, local_size, sha1, last_sync_ts) VALUES (?, ?, ?, ?, ?, ?, ?) "
+            "ON CONFLICT(pair_id, local_rel_path) DO UPDATE SET file_identity=excluded.file_identity, "
+            "local_mtime=excluded.local_mtime, local_size=excluded.local_size, sha1=excluded.sha1, "
+            "last_sync_ts=excluded.last_sync_ts",
             (pair_id, rel_path, file_identity, mtime, size, sha1, int(time.time()))
         )
         conn.commit()
         conn.close()
 
     def _update_pair_status(self, pair_id: str, status: str, sync_ts: int = None):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         if sync_ts:
             c.execute("UPDATE sync_pairs SET status = ?, last_sync_ts = ? WHERE id = ?",
@@ -273,7 +277,7 @@ class SyncManager:
         conn.close()
 
     def get_status(self) -> dict:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT COUNT(*), SUM(CASE WHEN status='syncing' THEN 1 ELSE 0 END), "
                   "SUM(CASE WHEN status='error' THEN 1 ELSE 0 END) FROM sync_pairs")

@@ -17,6 +17,7 @@ import json
 import os
 import re
 import sqlite3
+from db_adapter import connect_db
 import threading
 import time
 import urllib.request
@@ -73,7 +74,7 @@ class TelegramBotAdapter:
         }
 
     def _init_db(self):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("""
             CREATE TABLE IF NOT EXISTS tg_bindings (
@@ -87,7 +88,7 @@ class TelegramBotAdapter:
         conn.close()
 
     def _count_bindings(self) -> int:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT COUNT(*) FROM tg_bindings")
         n = c.fetchone()[0]
@@ -95,17 +96,19 @@ class TelegramBotAdapter:
         return int(n or 0)
 
     def bind_chat(self, chat_id: str, user_id: str, username: str):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
-            "INSERT OR REPLACE INTO tg_bindings (chat_id, user_id, username, bound_at) VALUES (?, ?, ?, ?)",
+            "INSERT INTO tg_bindings (chat_id, user_id, username, bound_at) VALUES (?, ?, ?, ?) "
+            "ON CONFLICT(chat_id) DO UPDATE SET user_id=excluded.user_id, "
+            "username=excluded.username, bound_at=excluded.bound_at",
             (str(chat_id), user_id, username, int(time.time())),
         )
         conn.commit()
         conn.close()
 
     def get_bound_user(self, chat_id: str) -> Optional[dict]:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT user_id, username FROM tg_bindings WHERE chat_id = ?", (str(chat_id),))
         row = c.fetchone()

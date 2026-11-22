@@ -17,6 +17,7 @@ import re
 import shutil
 import socket
 import sqlite3
+from db_adapter import connect_db
 import subprocess
 import threading
 import time
@@ -475,7 +476,7 @@ class OfflineEngine:
         return os.urandom(12).hex()
 
     def _conn(self):
-        conn = sqlite3.connect(self.db, timeout=15)
+        conn = connect_db(self.db, timeout=15)
         conn.row_factory = sqlite3.Row
         return conn
 
@@ -547,7 +548,10 @@ class OfflineEngine:
 
     def _meta_cache_put(self, infohash: str, meta: dict):
         with self._conn() as c:
-            c.execute("INSERT OR REPLACE INTO offline_meta VALUES (?,?,?,?,?)",
+            c.execute("""INSERT INTO offline_meta (infohash, name, size, files_json, update_ts)
+                         VALUES (?, ?, ?, ?, ?)
+                         ON CONFLICT(infohash) DO UPDATE SET name=excluded.name,
+                           size=excluded.size, files_json=excluded.files_json, update_ts=excluded.update_ts""",
                       (infohash, meta.get("name", ""), meta.get("size", 0),
                        json.dumps(meta.get("files", []), ensure_ascii=False), self._now()))
 
@@ -869,11 +873,20 @@ class OfflineEngine:
 
     def _insert(self, task: dict, user_id: str, gid: str):
         with self._lock, self._conn() as c:
-            c.execute("""INSERT OR REPLACE INTO offline_tasks
+            c.execute("""INSERT INTO offline_tasks
                 (identity,user_id,type,status,update_ts,file,create_ts,url,size,name,
                  task_identity,code,message,addon,progress,bytes_total,bytes_processed,
                  flag,save_path,callbacks,ignore_files,save_identity,gid,files_json,stored)
-                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)""", (
+                VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
+                ON CONFLICT(identity) DO UPDATE SET user_id=excluded.user_id, type=excluded.type,
+                 status=excluded.status, update_ts=excluded.update_ts, file=excluded.file,
+                 create_ts=excluded.create_ts, url=excluded.url, size=excluded.size, name=excluded.name,
+                 task_identity=excluded.task_identity, code=excluded.code, message=excluded.message,
+                 addon=excluded.addon, progress=excluded.progress, bytes_total=excluded.bytes_total,
+                 bytes_processed=excluded.bytes_processed, flag=excluded.flag, save_path=excluded.save_path,
+                 callbacks=excluded.callbacks, ignore_files=excluded.ignore_files,
+                 save_identity=excluded.save_identity, gid=excluded.gid, files_json=excluded.files_json,
+                 stored=excluded.stored""", (
                 task["identity"], user_id, task.get("type", TYPE_BT), task.get("status", ST_WAITING),
                 task.get("update_ts", 0), task.get("file", ""), task.get("create_ts", 0),
                 task.get("url", ""), task.get("size", 0), task.get("name", ""),

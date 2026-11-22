@@ -101,6 +101,33 @@ class PgCursorWrapper:
 
     def execute(self, sql: str, params: Optional[Iterable] = None):
         pg_sql = translate_sql_to_pg(sql)
+        pragma = re.match(r"\s*PRAGMA\s+table_info\s*\(\s*['\"]?([A-Za-z_][A-Za-z0-9_]*)['\"]?\s*\)\s*;?\s*$", sql, flags=re.I)
+        if pragma:
+            table_name = pragma.group(1)
+            self._cur.execute(
+                """SELECT (c.ordinal_position - 1)::int AS cid,
+                          c.column_name AS name,
+                          c.data_type AS type,
+                          CASE WHEN c.is_nullable = 'NO' THEN 1 ELSE 0 END AS not_null,
+                          c.column_default AS dflt_value,
+                          CASE WHEN EXISTS (
+                              SELECT 1
+                              FROM information_schema.table_constraints tc
+                              JOIN information_schema.key_column_usage kcu
+                                ON tc.constraint_name = kcu.constraint_name
+                               AND tc.table_schema = kcu.table_schema
+                               AND tc.table_name = kcu.table_name
+                              WHERE tc.constraint_type = 'PRIMARY KEY'
+                                AND tc.table_schema = c.table_schema
+                                AND tc.table_name = c.table_name
+                                AND kcu.column_name = c.column_name
+                          ) THEN 1 ELSE 0 END AS pk
+                   FROM information_schema.columns c
+                   WHERE c.table_schema = current_schema() AND c.table_name = %s
+                   ORDER BY c.ordinal_position""",
+                (table_name,),
+            )
+            return self
         if pg_sql.strip().upper().startswith("PRAGMA"):
             return self
         if params is None:

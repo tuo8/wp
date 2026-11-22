@@ -14,6 +14,7 @@ import hashlib
 import hmac
 import secrets
 import sqlite3
+from db_adapter import connect_db
 from pathlib import Path
 from typing import Optional
 
@@ -54,7 +55,7 @@ class ShareManager:
         self._init_db()
 
     def _init_db(self):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("""
             CREATE TABLE IF NOT EXISTS shares (
@@ -128,7 +129,7 @@ class ShareManager:
 
         expire_ts = int(time.time()) + expire_hours * 3600 if expire_hours else 0
 
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
             "INSERT INTO shares (share_id, file_identity, password_hash, has_password, "
@@ -149,7 +150,7 @@ class ShareManager:
         }
 
     def get_share(self, share_id: str, password: str = "") -> dict:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT file_identity, password_hash, has_password, expire_ts, "
                   "download_limit, download_count, like_count, dislike_count, save_count, "
@@ -177,7 +178,7 @@ class ShareManager:
             if not valid_password:
                 return {"success": False, "error": "Wrong password"}
             if upgraded_hash:
-                upgrade_conn = sqlite3.connect(str(self.db_path))
+                upgrade_conn = connect_db(self.db_path)
                 upgrade_conn.execute(
                     "UPDATE shares SET password_hash = ? WHERE share_id = ? AND password_hash = ?",
                     (upgraded_hash, share_id, pw_hash))
@@ -207,7 +208,7 @@ class ShareManager:
 
     def get_record(self, share_id: str) -> Optional[dict]:
         """Raw share row (no password gate) — for owners and protocol replies."""
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT share_id, file_identity, has_password, expire_ts, download_limit, "
                   "download_count, like_count, dislike_count, save_count, created_ts, "
@@ -227,7 +228,7 @@ class ShareManager:
     def react(self, share_id: str, action: str = "like") -> dict:
         """Like / dislike a share — mirrors ``PubFileShare.Like`` / ``Dislike``."""
         column = "dislike_count" if action == "dislike" else "like_count"
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(f"UPDATE shares SET {column} = {column} + 1 WHERE share_id = ?", (share_id,))
         if c.rowcount == 0:
@@ -242,7 +243,7 @@ class ShareManager:
 
     def add_complaint(self, share_id: str, user_id: str, content: str) -> dict:
         """File a complaint against a share (``ComplaintShare``)."""
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT creator_user_id FROM shares WHERE share_id = ?", (share_id,))
         row = c.fetchone()
@@ -263,7 +264,7 @@ class ShareManager:
                 "content": content, "status": 0, "create_ts": now}
 
     def list_complaints(self, user_id: str = None) -> list:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         if user_id is None:
             c.execute("SELECT identity, share_id, user_id, share_owner, content, status, "
@@ -286,7 +287,7 @@ class ShareManager:
         ids = [i for i in (identities or []) if i]
         if not ids:
             return 0
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         marks = ",".join("?" * len(ids))
         if user_id is None:
@@ -313,7 +314,7 @@ class ShareManager:
         target_name = name or meta.name
         clone = self.engine.clone_file(meta, target_name, parent=parent,
                                        user_id=user_id or "anonymous")
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("UPDATE shares SET save_count = save_count + 1 WHERE share_id = ?", (share_id,))
         conn.commit()
@@ -321,14 +322,14 @@ class ShareManager:
         return {"success": True, "file": clone, "save_count": int(info.get("save_count", 0)) + 1}
 
     def increment_download(self, share_id: str):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("UPDATE shares SET download_count = download_count + 1 WHERE share_id = ?", (share_id,))
         conn.commit()
         conn.close()
 
     def list_shares(self, user_id: str = None) -> list:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         if user_id is None:
             c.execute("SELECT share_id, file_identity, has_password, expire_ts, download_limit, "
@@ -357,7 +358,7 @@ class ShareManager:
         return results
 
     def delete_share(self, share_id: str, user_id: str = None):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         if user_id is None:
             c.execute("DELETE FROM shares WHERE share_id = ?", (share_id,))
@@ -372,7 +373,7 @@ class ShareManager:
     def create_ticket(self, user_id: str, subject: str, body: str, priority: str = "normal") -> dict:
         ticket_id = uuid.uuid4().hex[:12]
         now = int(time.time())
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
             "INSERT INTO tickets (ticket_id, user_id, subject, body, priority, status, created_ts, updated_ts) "
@@ -384,7 +385,7 @@ class ShareManager:
         return {"success": True, "ticket_id": ticket_id, "status": "open"}
 
     def list_tickets(self, user_id: str) -> list:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT ticket_id, subject, priority, status, created_ts, updated_ts, reply "
                   "FROM tickets WHERE user_id = ? ORDER BY created_ts DESC", (user_id,))
@@ -400,7 +401,7 @@ class ShareManager:
         ]
 
     def get_ticket(self, ticket_id: str) -> Optional[dict]:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT ticket_id, user_id, subject, body, priority, status, created_ts, updated_ts, reply "
                   "FROM tickets WHERE ticket_id = ?", (ticket_id,))
@@ -415,7 +416,7 @@ class ShareManager:
         }
 
     def reply_ticket(self, ticket_id: str, reply: str):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("UPDATE tickets SET reply = ?, status = 'answered', updated_ts = ? WHERE ticket_id = ?",
                   (reply, int(time.time()), ticket_id))
