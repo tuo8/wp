@@ -1,0 +1,50 @@
+[
+  {
+    "label": "hello_world_docs",
+    "is_control": true,
+    "gateway": "https://ipfs.io/ipfs/",
+    "cid": "bafkreiem4twkqzsq2aj4shbycd4yvoj2cx72vezicletlhi7dijjciqpui",
+    "http": 429,
+    "bytes": 188,
+    "seconds": 1.23,
+    "verdict": "gateway_rate_limited",
+    "body_head": "This IPFS gateway is switching to a service worker gateway only. See https://gatewaychanges.ipfs.io#/ipfs/bafkreiem4twkq",
+    "stderr": ""
+  },
+  {
+    "label": "hello_world_docs",
+    "is_control": true,
+    "gateway": "https://dweb.link/ipfs/",
+    "cid": "bafkreiem4twkqzsq2aj4shbycd4yvoj2cx72vezicletlhi7dijjciqpui",
+    "http": 0,
+    "bytes": 0,
+    "seconds": 2.04,
+    "verdict": "local_tls_failure",
+    "body_head": "",
+    "stderr": "curl: (35) schannel: next InitializeSecurityContext failed: CRYPT_E_REVOCATION_OFFLINE (0x80092013) - ���ڵ������������ѻ������������޷���������"
+  },
+  {
+    "label": "small_txt_raw",
+    "is_control": false,
+    "gateway": "https://ipfs.io/ipfs/",
+    "cid": "bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey",
+    "http": 429,
+    "bytes": 188,
+    "seconds": 1.26,
+    "verdict": "gateway_rate_limited",
+    "body_head": "This IPFS gateway is switching to a service worker gateway only. See https://gatewaychanges.ipfs.io#/ipfs/bafkreigztj4zp",
+    "stderr": ""
+  },
+  {
+    "label": "small_txt_raw",
+    "is_control": false,
+    "gateway": "https://dweb.link/ipfs/",
+    "cid": "bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey",
+    "http": 0,
+    "bytes": 0,
+    "seconds": 0.84,
+    "verdict": "local_tls_failure",
+    "body_head": "",
+    "stderr": "curl: (35) schannel: next InitializeSecurityContext failed: CRYPT_E_REVOCATION_OFFLINE (0x80092013) - ���ڵ������������ѻ������������޷���������"
+  }
+]

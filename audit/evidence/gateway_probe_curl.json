@@ -1,0 +1,182 @@
+[
+  {
+    "cid": "small_txt_raw",
+    "gateway": "https://ipfs.io/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 10.017709,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (56) CONNECT tunnel failed, response 502"
+  },
+  {
+    "cid": "small_txt_raw",
+    "gateway": "https://dweb.link/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 10.019375,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (56) CONNECT tunnel failed, response 502"
+  },
+  {
+    "cid": "small_txt_raw",
+    "gateway": "https://gateway.pinata.cloud/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 25.001922,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (28) Operation timed out after 25001 milliseconds with 0 bytes received"
+  },
+  {
+    "cid": "small_txt_raw",
+    "gateway": "https://4everland.io/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 14.301726,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (56) CONNECT tunnel failed, response 502"
+  },
+  {
+    "cid": "small_txt_raw",
+    "gateway": "https://trustless-gateway.link/ipfs/",
+    "status": 522,
+    "bytes": 7290,
+    "seconds": 22.785811,
+    "sha256": "61fd0e87bb460cb6d10d434c3e03f0ce79094692ae9dad78716729357e6149a0",
+    "body_head": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 old",
+    "stderr": ""
+  },
+  {
+    "cid": "small_txt_raw",
+    "gateway": "https://ipfs-gateway.qzy.xyz/ipfs/",
+    "status": 403,
+    "bytes": 17,
+    "seconds": 0.167146,
+    "sha256": "c4852fab374a2ac398e74819c7dc11fa4f97ecf5f799c1c06deaddbaf6825adc",
+    "body_head": "invalid sign name",
+    "stderr": ""
+  },
+  {
+    "cid": "png_raw",
+    "gateway": "https://ipfs.io/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 10.014083,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (56) CONNECT tunnel failed, response 502"
+  },
+  {
+    "cid": "png_raw",
+    "gateway": "https://dweb.link/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 10.021782,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (56) CONNECT tunnel failed, response 502"
+  },
+  {
+    "cid": "png_raw",
+    "gateway": "https://gateway.pinata.cloud/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 25.012494,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (28) Operation timed out after 25012 milliseconds with 0 bytes received"
+  },
+  {
+    "cid": "png_raw",
+    "gateway": "https://4everland.io/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 25.016605,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (28) Connection timed out after 25016 milliseconds"
+  },
+  {
+    "cid": "png_raw",
+    "gateway": "https://trustless-gateway.link/ipfs/",
+    "status": 525,
+    "bytes": 7792,
+    "seconds": 1.545072,
+    "sha256": "10503102d6cd1b8effb71af6eac415f32a3444dd38ddcedff33fdfe1cbe1f6ef",
+    "body_head": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 old",
+    "stderr": ""
+  },
+  {
+    "cid": "png_raw",
+    "gateway": "https://ipfs-gateway.qzy.xyz/ipfs/",
+    "status": 403,
+    "bytes": 17,
+    "seconds": 0.144487,
+    "sha256": "c4852fab374a2ac398e74819c7dc11fa4f97ecf5f799c1c06deaddbaf6825adc",
+    "body_head": "invalid sign name",
+    "stderr": ""
+  },
+  {
+    "cid": "20m_root_dagpb",
+    "gateway": "https://ipfs.io/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 10.014187,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (56) CONNECT tunnel failed, response 502"
+  },
+  {
+    "cid": "20m_root_dagpb",
+    "gateway": "https://dweb.link/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 10.021987,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (56) CONNECT tunnel failed, response 502"
+  },
+  {
+    "cid": "20m_root_dagpb",
+    "gateway": "https://gateway.pinata.cloud/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 25.01635,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (28) Operation timed out after 25016 milliseconds with 0 bytes received"
+  },
+  {
+    "cid": "20m_root_dagpb",
+    "gateway": "https://4everland.io/ipfs/",
+    "status": 0,
+    "bytes": 0,
+    "seconds": 25.002147,
+    "sha256": null,
+    "body_head": "",
+    "stderr": "curl: (28) Connection timed out after 25002 milliseconds"
+  },
+  {
+    "cid": "20m_root_dagpb",
+    "gateway": "https://trustless-gateway.link/ipfs/",
+    "status": 525,
+    "bytes": 7792,
+    "seconds": 4.106583,
+    "sha256": "d3b9cdb71b5657c8914d7818ddbfa30686278d0e1bb9cd7e36e9810da011d0d8",
+    "body_head": "<!DOCTYPE html>\n<!--[if lt IE 7]> <html class=\"no-js ie6 old",
+    "stderr": ""
+  },
+  {
+    "cid": "20m_root_dagpb",
+    "gateway": "https://ipfs-gateway.qzy.xyz/ipfs/",
+    "status": 403,
+    "bytes": 17,
+    "seconds": 0.160517,
+    "sha256": "c4852fab374a2ac398e74819c7dc11fa4f97ecf5f799c1c06deaddbaf6825adc",
+    "body_head": "invalid sign name",
+    "stderr": ""
+  }
+]

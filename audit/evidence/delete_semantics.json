@@ -1,0 +1,82 @@
+{
+  "name": "hc-audit-video-202611222050.mp4",
+  "identity": "[REDACTED_ID]",
+  "cid": "bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m",
+  "t0_in_root": true,
+  "t0_trash_list": {
+    "status": "0",
+    "count": 100,
+    "has_target": false,
+    "names_head": "[REDACTED]"
+  },
+  "t0_direct": {
+    "grpc_status": "0",
+    "message": "",
+    "url_present": true,
+    "status": 200,
+    "bytes": 1356,
+    "note": "\u0000\u0000\u0000 ftypisom\u0000\u0000\u0002\u0000isomiso2avc1mp41\u0000\u0000\u0000tmoov\u0000\u0000\u0000lmvhd\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0003�\u0000\u0000\u000b�\u0000\u0001\u0000\u0000\u0001\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+  },
+  "trash_call": {
+    "grpc_status": "0",
+    "grpc_message": "",
+    "pb": {
+      "1": "lock__user_operation__[REDACTED_ID]",
+      "2": 1000,
+      "3": 1,
+      "4": 1795352534010,
+      "5": 100
+    }
+  },
+  "t1_in_root": false,
+  "t1_trash_list": {
+    "status": "0",
+    "count": 100,
+    "has_target": false,
+    "names_head": "[REDACTED]"
+  },
+  "t1_direct": {
+    "grpc_status": "5",
+    "message": "file not found",
+    "url_present": false
+  },
+  "t1_slice": {
+    "grpc_status": "5",
+    "slices": 0
+  },
+  "t1_public_gateway": {
+    "status": 403,
+    "bytes": 17
+  },
+  "purge_call": {
+    "grpc_status": "0",
+    "grpc_message": "",
+    "pb": {
+      "1": "lock__user_operation__[REDACTED_ID]",
+      "2": 1000,
+      "3": 1,
+      "4": 1795352540900,
+      "5": 100
+    }
+  },
+  "t2_in_root": false,
+  "t2_trash_list": {
+    "status": "0",
+    "count": 100,
+    "has_target": false,
+    "names_head": "[REDACTED]"
+  },
+  "t2_direct": {
+    "grpc_status": "5",
+    "message": "file not found",
+    "url_present": false
+  },
+  "t2_slice": {
+    "grpc_status": "5",
+    "slices": 0
+  },
+  "t2_public_gateway": {
+    "status": 403,
+    "bytes": 17
+  }
+}

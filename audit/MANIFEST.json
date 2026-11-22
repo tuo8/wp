@@ -1,0 +1,192 @@
+{
+  "generated_at": "2026-11-22T22:35:00+0800",
+  "source_workspace": "本地审计工作目录 audit/（已脱敏复制，不含凭据）",
+  "redaction": [
+    "32 位十六进制 identity → [REDACTED_ID]",
+    "URL 查询串值 → [REDACTED]，仅保留参数名",
+    "session / token / auth_key / password / secret / sign 等键整段丢弃",
+    "账号私有内容（用户信息、WebDAV 口令、分享条目、回收站条目名）整体移除"
+  ],
+  "files": [
+    {
+      "path": "audit/evidence/account_readonly.json",
+      "bytes": 1784,
+      "sha256": "fcb94ee66c45e3cc6c37d6587be2f66935c2fadb21058bd905a4c88cd1142933",
+      "note": "配额、预览、DAV 接口可用性采样（账号私有内容已剔除）"
+    },
+    {
+      "path": "audit/evidence/dav_headers.txt",
+      "bytes": 189,
+      "sha256": "72e26a4868489a69dd52ca8da9b4448579aaba551405e3b6c0f212d718386a31",
+      "note": "WebDAV PROPFIND 响应头（207）"
+    },
+    {
+      "path": "audit/evidence/dav_propfind.xml",
+      "bytes": 520,
+      "sha256": "69005c499c13f127abd6f344f5f21c7fb509e532698e1408a03c4e53eb335718",
+      "note": "WebDAV PROPFIND 根目录 207 响应体"
+    },
+    {
+      "path": "audit/evidence/delete_cache.json",
+      "bytes": 902,
+      "sha256": "371795557fa44ad051e891f66bae843980c5fa04155cec1a736cac4e5c960ba3",
+      "note": "1 MiB 唯一 CID 文件删除后旧地址仍可取回"
+    },
+    {
+      "path": "audit/evidence/delete_semantics.json",
+      "bytes": 1982,
+      "sha256": "0cdd98c73de85b8f987ad682f596f0b8b5bd5ca80a949ff76aa19b1727dc8deb",
+      "note": "video 文件 Trash/DeleteTrash 前后的 API 与旧 URL 行为（回收站条目名已移除）"
+    },
+    {
+      "path": "audit/evidence/delete_window.json",
+      "bytes": 2451,
+      "sha256": "a393f6341191252ab18b70eca323447e2c90b7e9a2d49448e2f5446c014110ca",
+      "note": "删除后 0/30/60/120/240 s 受控计时采样（文件与本批 small 同 CID，存在混淆）"
+    },
+    {
+      "path": "audit/evidence/downloads.json",
+      "bytes": 18833,
+      "sha256": "d2aa5a76b72a64a009083e82dff2a69cdbb9aa4f72351eb6a76b8963f70c492b",
+      "note": "6 个文件的分片与直链下载结果、哈希比对、Range（URL 已脱敏）"
+    },
+    {
+      "path": "audit/evidence/gateway_probe_curl.json",
+      "bytes": 5083,
+      "sha256": "e43e76ca5bd369e40b7d40027692ec071073e47910fd27c0618487378655b4da",
+      "note": "6 个公共/私有网关的取回尝试：全部为网络或 Cloudflare 拦截，非内容层结论"
+    },
+    {
+      "path": "audit/evidence/gateway_probe_disposition.json",
+      "bytes": 1963,
+      "sha256": "10511c4e7f549276002a8f7120cc23f9761732c8fc44bca2a898fd5b6730bf61",
+      "note": "网关探测归因：429 限流 / 本机 TLS 失败，阳性对照与目标同为失败 ⇒ 该通道不构成证据"
+    },
+    {
+      "path": "audit/evidence/gh_repos.json",
+      "bytes": 3759,
+      "sha256": "007111b760ae10b45a2ef513f26a4dde44bedf0faba8cacaa8847c2efd8ee17a",
+      "note": "GitHub 组织 9 个仓库的公开元数据（裁剪字段）"
+    },
+    {
+      "path": "audit/evidence/providers_curl.json",
+      "bytes": 447,
+      "sha256": "9af26b1cb88b3a194aa6deb2109fe2bb02b5ace6e0790a922eabed655fc75104",
+      "note": "delegated-ipfs.dev 的 provider 查询（3 个 CID，均为空）"
+    },
+    {
+      "path": "audit/evidence/providers_positive_control.json",
+      "bytes": 1101,
+      "sha256": "44ef24519f6a3586d51bbe8deb066f7023fc65ad6522afc4c314281f3497ad0b",
+      "note": "同一接口对公开已知 CID 的 provider 查询（阳性对照，证明接口可用）"
+    },
+    {
+      "path": "audit/evidence/rest_routes.json",
+      "bytes": 15889,
+      "sha256": "e3cc213cc288b6efc0ba8c82e8864e658a6848a48c3a03050941a0026b200fb3",
+      "note": "从官方 proto 解析的 113 RPC / 62 REST 全量清单"
+    },
+    {
+      "path": "audit/evidence/root_state_now.json",
+      "bytes": 1739,
+      "sha256": "b3c5cf08a5403b314bbb114536978c3d1431aa0c4daa54b390e4b523c6a99336",
+      "note": "复核时账号根目录残留的 8 个 hc-* 测试对象（文件名/大小/CID）"
+    },
+    {
+      "path": "audit/evidence/slice_raw.bin",
+      "bytes": 4157,
+      "sha256": "09030c86ea996eccd9099c015fa9585516299b7edbbf4df0f2fb5130b5dec6b3",
+      "note": "分片通道返回的 4 KiB 密文样本（内容是本次自造测试文件，无隐私）"
+    },
+    {
+      "path": "audit/evidence/uploads.json",
+      "bytes": 12734,
+      "sha256": "bf9ffb3bf38c989bcdfe376dcdc8574a13a26f8015a230962ded5cba68315462",
+      "note": "6 个链路测量文件的上传任务/分片/耗时/CID（身份与 URL 已脱敏）"
+    },
+    {
+      "path": "audit/evidence/verify_20m_per_slice.json",
+      "bytes": 3157,
+      "sha256": "872eb4f468a7cc576a0038d78ca91d58720df94b1ca1a97ec508d6898d500b32",
+      "note": "20 MiB 文件逐片使用各自 encrypt 解码后的哈希复核（纠正单键套用缺陷）"
+    },
+    {
+      "path": "audit/scripts/account_probe.py",
+      "bytes": 1534,
+      "sha256": "76cdd831e0fdfac5d6c22744f0d54eccf67a7fcf1b568e6c772e47a893bfa423",
+      "note": "只读账户/配额/DAV 采样"
+    },
+    {
+      "path": "audit/scripts/cid_nodes.mjs",
+      "bytes": 1416,
+      "sha256": "d88b2430b0435949c75085aca22f7bfb7a458c5e6e6621912584d5e7195f857f",
+      "note": "用 ipfs-unixfs-importer 离线复算根 CID 与 DAG 结构"
+    },
+    {
+      "path": "audit/scripts/delete_cache_test.py",
+      "bytes": 3344,
+      "sha256": "efc971a0335daa9855dc819258576a323de5975f05b05c923ec6a3e6c82958f6",
+      "note": "删除后旧地址可读性测试（1 MiB 唯一 CID）"
+    },
+    {
+      "path": "audit/scripts/delete_window.py",
+      "bytes": 3102,
+      "sha256": "85632446604aa1d23128b11f579c3a3677c4f2b8f2248a2f9a2adc8982dad28c",
+      "note": "删除后 240 s 受控计时采样"
+    },
+    {
+      "path": "audit/scripts/download_test.py",
+      "bytes": 6101,
+      "sha256": "b730cc4cf745fa3e8762c09a35af74b8e37e40f241cf953c1f7450a86158f758",
+      "note": "分片/直链下载 + 哈希比对"
+    },
+    {
+      "path": "audit/scripts/gen_files.py",
+      "bytes": 2926,
+      "sha256": "26bb26b718aa82d3d62854ce95eadfb853337b2b4db86a93d12672b8e02ec536",
+      "note": "生成 6 个固定种子的测试文件"
+    },
+    {
+      "path": "audit/scripts/hc.py",
+      "bytes": 4392,
+      "sha256": "0e9702a50d4af45b71298f47fb17ee44a20ef51b83f66b10bff63e72453056e6",
+      "note": "最小 gRPC-Web 客户端：签名 + 令牌刷新（密钥改环境变量）"
+    },
+    {
+      "path": "audit/scripts/ipfs_check2.py",
+      "bytes": 3734,
+      "sha256": "e53954d8115d439b50bd71e94ef3a942e6589191a221d2ec26726d50298dab71",
+      "note": "DHT provider 与公共网关探测（curl 版）"
+    },
+    {
+      "path": "audit/scripts/ipfs_disposition.py",
+      "bytes": 3955,
+      "sha256": "57560bc829b44c210d0b1a7ced767b0694e5e54600ab626371ee2bb709c73555",
+      "note": "DHT provider 阳性对照 + 网关失败归因"
+    },
+    {
+      "path": "audit/scripts/parse_protos.py",
+      "bytes": 1753,
+      "sha256": "d6d56dfaddb2bf64a05feb3522ed66c6362b5d4adc3256dcd266709a561e810b",
+      "note": "从 proto 解析 RPC/REST 清单"
+    },
+    {
+      "path": "audit/scripts/run_uploads.py",
+      "bytes": 1987,
+      "sha256": "1c66634daf09d14a7eeeaad0d418b1da5d803e47e2fd6a4915db6b0d01058684",
+      "note": "串行上传全部测试文件并记录证据"
+    },
+    {
+      "path": "audit/scripts/upload_test.py",
+      "bytes": 6355,
+      "sha256": "76bc313b6b1fca80a46bc8e3a1841908fd45d914f7948fa4e44a15e553b49a28",
+      "note": "单文件上传：建任务 → 逐片 POST → 提交"
+    },
+    {
+      "path": "audit/scripts/verify_20m.py",
+      "bytes": 2576,
+      "sha256": "c567f4d301d60ceb40877549c8bd83d41875be062767eed6a36864de8b93f75b",
+      "note": "20 MiB 逐片 XOR 解码复核"
+    }
+  ]
+}

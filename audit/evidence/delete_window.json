@@ -1,0 +1,100 @@
+{
+  "file": "hc-audit-ttl-211642.txt",
+  "identity": "[REDACTED_ID]",
+  "cid": "bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey",
+  "sha256": "d99a7997a3e1221af95c8c755e63b44d7c06a4bc32e91aeaacb3a48f97302326",
+  "checks": [
+    {
+      "tag": "before_delete",
+      "elapsed_s": 0,
+      "direct_status": 200,
+      "direct_bytes": 4157,
+      "direct_match": true,
+      "slice_status": 200,
+      "slice_bytes": 4157,
+      "slice_match": true,
+      "api_direct": "0",
+      "api_slices": "0"
+    },
+    {
+      "tag": "after_trash",
+      "elapsed_s": 2.0,
+      "direct_status": 200,
+      "direct_bytes": 4157,
+      "direct_match": true,
+      "slice_status": 200,
+      "slice_bytes": 4157,
+      "slice_match": true,
+      "api_direct": "5",
+      "api_slices": "5"
+    },
+    {
+      "tag": "after_purge+0s",
+      "elapsed_s": 3.8,
+      "direct_status": 200,
+      "direct_bytes": 4157,
+      "direct_match": true,
+      "slice_status": 200,
+      "slice_bytes": 4157,
+      "slice_match": true,
+      "api_direct": "5",
+      "api_slices": "5"
+    },
+    {
+      "tag": "after_purge+30s",
+      "elapsed_s": 30.7,
+      "direct_status": 200,
+      "direct_bytes": 4157,
+      "direct_match": true,
+      "slice_status": 200,
+      "slice_bytes": 4157,
+      "slice_match": true,
+      "api_direct": "5",
+      "api_slices": "5"
+    },
+    {
+      "tag": "after_purge+60s",
+      "elapsed_s": 60.7,
+      "direct_status": 200,
+      "direct_bytes": 4157,
+      "direct_match": true,
+      "slice_status": 200,
+      "slice_bytes": 4157,
+      "slice_match": true,
+      "api_direct": "5",
+      "api_slices": "5"
+    },
+    {
+      "tag": "after_purge+120s",
+      "elapsed_s": 120.7,
+      "direct_status": 200,
+      "direct_bytes": 4157,
+      "direct_match": true,
+      "slice_status": 200,
+      "slice_bytes": 4157,
+      "slice_match": true,
+      "api_direct": "5",
+      "api_slices": "5"
+    },
+    {
+      "tag": "after_purge+240s",
+      "elapsed_s": 240.7,
+      "direct_status": 200,
+      "direct_bytes": 4157,
+      "direct_match": true,
+      "slice_status": 200,
+      "slice_bytes": 4157,
+      "slice_match": true,
+      "api_direct": "5",
+      "api_slices": "5"
+    }
+  ],
+  "trash": {
+    "grpc_status": "0",
+    "grpc_message": ""
+  },
+  "purge": {
+    "grpc_status": "0",
+    "grpc_message": ""
+  }
+}

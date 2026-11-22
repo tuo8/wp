@@ -1,0 +1,39 @@
+{
+  "file": "hc-audit-1m-202611222050.bin",
+  "identity": "[REDACTED_ID]",
+  "sha256": "ce443b404acfb5f3f787381daebd7b837482606f1bee59a23de5965dd8c51fcc",
+  "pre_delete": {
+    "slice_status": 200,
+    "bytes": 1048576,
+    "xor_key": 55,
+    "plain_match": true,
+    "direct_status": 200,
+    "direct_match": true
+  },
+  "trash": {
+    "grpc_status": "0",
+    "grpc_message": ""
+  },
+  "post_trash": {
+    "slice_status": 200,
+    "bytes": 1048576,
+    "still_plain_match": true,
+    "api_slices": "5",
+    "api_direct": "5",
+    "old_direct_status": 200,
+    "old_direct_match": true
+  },
+  "purge": {
+    "grpc_status": "0",
+    "grpc_message": ""
+  },
+  "post_purge": {
+    "slice_status": 200,
+    "bytes": 1048576,
+    "still_plain_match": true,
+    "api_slices": "5",
+    "api_direct": "5",
+    "old_direct_status": 200,
+    "old_direct_match": true
+  }
+}

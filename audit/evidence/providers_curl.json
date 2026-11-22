@@ -1,0 +1,23 @@
+[
+  {
+    "cid": "small_txt_raw",
+    "status": 200,
+    "provider_count": 0,
+    "providers": [],
+    "body_head": "{\"Providers\":[]}\n"
+  },
+  {
+    "cid": "png_raw",
+    "status": 200,
+    "provider_count": 0,
+    "providers": [],
+    "body_head": "{\"Providers\":[]}\n"
+  },
+  {
+    "cid": "20m_root_dagpb",
+    "status": 200,
+    "provider_count": 0,
+    "providers": [],
+    "body_head": "{\"Providers\":[]}\n"
+  }
+]

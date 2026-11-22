@@ -1,0 +1,680 @@
+[
+  {
+    "service": "v6.services.oauth.OauthAuthorization",
+    "rpc": "Authorize",
+    "rest": "/v6/oauth/authorize",
+    "commented": false
+  },
+  {
+    "service": "v6.services.oauth.OauthAuthorization",
+    "rpc": "DeviceCode",
+    "rest": "/v6/oauth/device_code",
+    "commented": false
+  },
+  {
+    "service": "v6.services.oauth.OauthAuthorization",
+    "rpc": "GetAuthorizeState",
+    "rest": "/v6/oauth/get_authorize_state",
+    "commented": false
+  },
+  {
+    "service": "v6.services.oauth.OauthAuthorization",
+    "rpc": "GetDeviceCodeState",
+    "rest": "/v6/oauth/get_device_code_state",
+    "commented": false
+  },
+  {
+    "service": "v6.services.oauth.OauthAuthorization",
+    "rpc": "GetToken",
+    "rest": "/v6/oauth/get_token",
+    "commented": false
+  },
+  {
+    "service": "v6.services.oauth.OauthAuthorization",
+    "rpc": "RefreshToken",
+    "rest": "/v6/oauth/refresh_token",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubOfflineTask",
+    "rpc": "Parse",
+    "rest": "/v6/offline_task/parse",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubOfflineTask",
+    "rpc": "Add",
+    "rest": "/v6/offline_task/add",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubOfflineTask",
+    "rpc": "List",
+    "rest": "/v6/offline_task/list",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubOfflineTask",
+    "rpc": "Delete",
+    "rest": "/v6/offline_task/delete",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSftpConfig",
+    "rpc": "Create",
+    "rest": null,
+    "commented": true
+  },
+  {
+    "service": "v6.services.pub.PubSftpConfig",
+    "rpc": "Get",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSftpConfig",
+    "rpc": "Update",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSftpConfig",
+    "rpc": "Enable",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSftpConfig",
+    "rpc": "Disable",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSftpConfig",
+    "rpc": "UpdateKeys",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSftpConfig",
+    "rpc": "ValidateUserName",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "Create",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "Get",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "Like",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "Dislike",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "ComplaintShare",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "List",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "ListComplaint",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "Delete",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "DeleteComplaint",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubFileShare",
+    "rpc": "Save",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSlice",
+    "rpc": "GetSlice",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSlice",
+    "rpc": "CreateSlice",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSlice",
+    "rpc": "GetMeta",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSlice",
+    "rpc": "CreateMeta",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSlice",
+    "rpc": "AddFastLookup",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubSlice",
+    "rpc": "GetFastLookup",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "Get",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "List",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "Create",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "GetContactInfo",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "UpdateContactInfo",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "ListConversation",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "Comment",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "Delete",
+    "rest": null,
+    "commented": true
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "Delete",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubTicket",
+    "rpc": "Close",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "Get",
+    "rest": "/v6/user/get",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "Login",
+    "rest": "/v6/user/login",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "Refresh",
+    "rest": "/v6/user/refresh",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "Logoff",
+    "rest": "/v6/user/logoff",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "DeviceAuthorization",
+    "rest": "/v6/user/device_authorization",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "ResetPassword",
+    "rest": "/v6/user/reset_password",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "ChangePassword",
+    "rest": "/v6/user/change_password",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "Register",
+    "rest": "/v6/user/register",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "Delete",
+    "rest": "/v6/user/delete",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "Update",
+    "rest": "/v6/user/update",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "SendSmsVerifyCode",
+    "rest": "/v6/user/sms_verify_code",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "SendSmsVerifyCodeNotUser",
+    "rest": "/v6/user/sms_verify_code_not_user",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "VerifyAuthToken",
+    "rest": "/v6/user/verify_auth_token",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "VerifyAuthorizationCode",
+    "rest": "/v6/user/verify_authorization_code",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "CheckAuthStatus",
+    "rest": "/v6/user/check_auth_status",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "CreateAuthToken",
+    "rest": "/v6/user/create_auth_token",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "ValidateUserInfo",
+    "rest": "/v6/user/validate_user_info",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "GetStatisticsAndQuota",
+    "rest": "/v6/user/get_statistics_and_quota",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "ExtendQuota",
+    "rest": "/v6/user/extend_quota",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "GetAvailableExtendQuota",
+    "rest": "/v6/user/get_available_extend_quota",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "UserCenterUri",
+    "rest": "/v6/user/user_center_uri",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "GetSettings",
+    "rest": "/v6/user/get_settings",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUser",
+    "rpc": "SetSettings",
+    "rest": "/v6/user/set_settings",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Create",
+    "rest": "/v6/userfile/create",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Get",
+    "rest": "/v6/userfile/get",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Update",
+    "rest": null,
+    "commented": true
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Rename",
+    "rest": "/v6/userfile/rename",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Trash",
+    "rest": "/v6/userfile/trash",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Move",
+    "rest": "/v6/userfile/move",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Copy",
+    "rest": "/v6/userfile/copy",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Delete",
+    "rest": "/v6/userfile/delete",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "DeleteTrash",
+    "rest": "/v6/userfile/delete_trash",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Recover",
+    "rest": "/v6/userfile/recover",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "BatchRename",
+    "rest": "/v6/userfile/batch_rename",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "BatchOperation",
+    "rest": "/v6/userfile/batch_operation",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "List",
+    "rest": "/v6/userfile/list",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "ListTrash",
+    "rest": "/v6/userfile/list_trash",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "Search",
+    "rest": "/v6/userfile/search",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "CreateManageRTCOffer",
+    "rest": "/v6/userfile/create_manage_rtc_offer",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "SendClientIceCandidate",
+    "rest": "/v6/userfile/send_client_ice_candidate",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "GetServerIceCandidate",
+    "rest": "/v6/userfile/get_server_ice_candidate",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "ParseFileSlice",
+    "rest": "/v6/userfile/parse_file_slice",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "GetSliceDownloadAddress",
+    "rest": "/v6/userfile/get_slice_download_address",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "GetDirectDownloadAddress",
+    "rest": "/v6/userfile/get_direct_download_address",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "GetDownloadAndPreviewInfo",
+    "rest": "/v6/userfile/get_download_and_preview_info",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "PreviewDoc",
+    "rest": "/v6/userfile/preview_doc",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "CreateDoc",
+    "rest": "/v6/userfile/create_doc",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "CreateUploadToken",
+    "rest": "/v6/userfile/create_upload_token",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "CreateUploadTask",
+    "rest": "/v6/userfile/create_upload_task",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "CreateTemporaryUpload",
+    "rest": "/v6/userfile/create_temporary_upload",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "ReportPreviewStatus",
+    "rest": "/v6/userfile/report_preview_status",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "GetFileSlicesDownloadInfo",
+    "rest": "/v6/userfile/get_file_slices_download_info",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "ListRecentUpdatedFiles",
+    "rest": "/v6/userfile/list_recent_updated_files",
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubUserFile",
+    "rpc": "CreateDownloadAnswer",
+    "rest": null,
+    "commented": true
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "Create",
+    "rest": null,
+    "commented": true
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "Get",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "Update",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "Enable",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "Disable",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "ListAll",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "List",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "ValidateUserName",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "ServerInfo",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "Create",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.pub.PubDavConfig",
+    "rpc": "Delete",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.p2p.WebRTCManageService",
+    "rpc": "StartDownload",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.p2p.WebRTCManageService",
+    "rpc": "StopDownload",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.p2p.WebRTCManageService",
+    "rpc": "Disconnect",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.p2p.WebRTCManageService",
+    "rpc": "SendPeerIceCandidate",
+    "rest": null,
+    "commented": false
+  },
+  {
+    "service": "v6.services.p2p.WebRTCManageService",
+    "rpc": "Receive",
+    "rest": null,
+    "commented": false
+  }
+]

@@ -1,0 +1,421 @@
+{
+  "started": "2026-11-22T20:50:07+0800",
+  "user": "[REDACTED]",
+  "root": "[REDACTED_ID]",
+  "cases": [
+    {
+      "file": "hc-test-small.txt",
+      "name": "hc-audit-small-202611222050.txt",
+      "size": 4157,
+      "sha256": "d99a7997a3e1221af95c8c755e63b44d7c06a4bc32e91aeaacb3a48f97302326",
+      "md5": "94475ed5fb745983a6a70f9f3f27bb6f",
+      "mime": "text/plain",
+      "create_upload_task": {
+        "grpc_status": "0",
+        "grpc_message": "",
+        "http": 200
+      },
+      "upload_task": {
+        "upload_address": "https://simple-file-proxy.2dland.cn/int/blocks",
+        "task_prefix": "[REDACTED]",
+        "block_size": 4194304,
+        "block_hash_type": 18,
+        "block_version": 1,
+        "block_codec": 85,
+        "created": null,
+        "has_s3_credentials": false,
+        "endpoint": null
+      },
+      "chunks": [
+        {
+          "index": 0,
+          "len": 4157,
+          "cid": "bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey",
+          "status": 201,
+          "elapsed": 0.253,
+          "resp": "[REDACTED]"
+        }
+      ],
+      "chunk_count": 1,
+      "head_first_chunk": {
+        "status": 200,
+        "len": 6,
+        "sha256_match": false
+      },
+      "commit": {
+        "status": 200,
+        "elapsed": 0.321,
+        "resp": "[REDACTED]"
+      },
+      "upload_seconds": 1.06,
+      "upload_Bps": 3921.7,
+      "local_chunk_cids": [
+        "bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey"
+      ],
+      "entry": {
+        "1": "[REDACTED_ID]",
+        "3": "[REDACTED_ID]",
+        "4": "hc-audit-small-202611222050.txt",
+        "5": "/hc-audit-small-202611222050.txt",
+        "6": "application/octet-stream",
+        "7": 4157,
+        "8": 40,
+        "9": 1795351807520,
+        "10": 1795351807520,
+        "24": "bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey",
+        "31": "hcauditsmall202611222050 txt"
+      }
+    },
+    {
+      "file": "hc-test-1m.bin",
+      "name": "hc-audit-1m-202611222050.bin",
+      "size": 1048576,
+      "sha256": "ce443b404acfb5f3f787381daebd7b837482606f1bee59a23de5965dd8c51fcc",
+      "md5": "fadbbb0e50bb5ad5cbdd705f905d215e",
+      "mime": "application/octet-stream",
+      "create_upload_task": {
+        "grpc_status": "0",
+        "grpc_message": "",
+        "http": 200
+      },
+      "upload_task": {
+        "upload_address": "https://simple-file-proxy.2dland.cn/int/blocks",
+        "task_prefix": "[REDACTED]",
+        "block_size": 4194304,
+        "block_hash_type": 18,
+        "block_version": 1,
+        "block_codec": 85,
+        "created": null,
+        "has_s3_credentials": false,
+        "endpoint": null
+      },
+      "chunks": [
+        {
+          "index": 0,
+          "len": 1048576,
+          "cid": "bafkreigoiq5uaswpwxz7pbzydwxl264dosbga3y35zm2eppfszo5rri7zq",
+          "status": 201,
+          "elapsed": 0.448,
+          "resp": "[REDACTED]"
+        }
+      ],
+      "chunk_count": 1,
+      "head_first_chunk": {
+        "status": 200,
+        "len": 6,
+        "sha256_match": false
+      },
+      "commit": {
+        "status": 200,
+        "elapsed": 0.276,
+        "resp": "[REDACTED]"
+      },
+      "upload_seconds": 1.22,
+      "upload_Bps": 859488.5,
+      "local_chunk_cids": [
+        "bafkreigoiq5uaswpwxz7pbzydwxl264dosbga3y35zm2eppfszo5rri7zq"
+      ],
+      "entry": {
+        "1": "[REDACTED_ID]",
+        "3": "[REDACTED_ID]",
+        "4": "hc-audit-1m-202611222050.bin",
+        "5": "/hc-audit-1m-202611222050.bin",
+        "6": "application/octet-stream",
+        "7": 1048576,
+        "8": 40,
+        "9": 1795351810004,
+        "10": 1795351810004,
+        "24": "bafkreigoiq5uaswpwxz7pbzydwxl264dosbga3y35zm2eppfszo5rri7zq",
+        "31": "hcaudit1m202611222050 bin"
+      }
+    },
+    {
+      "file": "hc-test-4m.bin",
+      "name": "hc-audit-4m-202611222050.bin",
+      "size": 4194304,
+      "sha256": "cc3de6b622017542c89e168968839446a29f60df7344d313cbdec70b50bee2fe",
+      "md5": "e69d56316a459ceb1dfb2a85c6e597cd",
+      "mime": "application/octet-stream",
+      "create_upload_task": {
+        "grpc_status": "0",
+        "grpc_message": "",
+        "http": 200
+      },
+      "upload_task": {
+        "upload_address": "https://simple-file-proxy.2dland.cn/int/blocks",
+        "task_prefix": "[REDACTED]",
+        "block_size": 4194304,
+        "block_hash_type": 18,
+        "block_version": 1,
+        "block_codec": 85,
+        "created": null,
+        "has_s3_credentials": false,
+        "endpoint": null
+      },
+      "chunks": [
+        {
+          "index": 0,
+          "len": 4194304,
+          "cid": "bafkreigmhxtlmiqbovbmrhqwrfuihfcgukpwbx3titjrhs66y4fvbpxc7y",
+          "status": 201,
+          "elapsed": 0.533,
+          "resp": "[REDACTED]"
+        }
+      ],
+      "chunk_count": 1,
+      "head_first_chunk": {
+        "status": 200,
+        "len": 6,
+        "sha256_match": false
+      },
+      "commit": {
+        "status": 200,
+        "elapsed": 0.249,
+        "resp": "[REDACTED]"
+      },
+      "upload_seconds": 1.26,
+      "upload_Bps": 3328812.7,
+      "local_chunk_cids": [
+        "bafkreigmhxtlmiqbovbmrhqwrfuihfcgukpwbx3titjrhs66y4fvbpxc7y"
+      ],
+      "entry": {
+        "1": "[REDACTED_ID]",
+        "3": "[REDACTED_ID]",
+        "4": "hc-audit-4m-202611222050.bin",
+        "5": "/hc-audit-4m-202611222050.bin",
+        "6": "application/octet-stream",
+        "7": 4194304,
+        "8": 40,
+        "9": 1795351812542,
+        "10": 1795351812542,
+        "24": "bafkreigmhxtlmiqbovbmrhqwrfuihfcgukpwbx3titjrhs66y4fvbpxc7y",
+        "31": "hcaudit4m202611222050 bin"
+      }
+    },
+    {
+      "file": "hc-test-20m.bin",
+      "name": "hc-audit-20m-202611222050.bin",
+      "size": 20971520,
+      "sha256": "38990a5b2d0cd1e6c978e8477eb3a34da47298965b8fc458ebcfc0114f4bf4b3",
+      "md5": "2b7b20824cbab8262f1dae7fd483df66",
+      "mime": "application/octet-stream",
+      "create_upload_task": {
+        "grpc_status": "0",
+        "grpc_message": "",
+        "http": 200
+      },
+      "upload_task": {
+        "upload_address": "https://simple-file-proxy.2dland.cn/int/blocks",
+        "task_prefix": "[REDACTED]",
+        "block_size": 4194304,
+        "block_hash_type": 18,
+        "block_version": 1,
+        "block_codec": 85,
+        "created": null,
+        "has_s3_credentials": false,
+        "endpoint": null
+      },
+      "chunks": [
+        {
+          "index": 0,
+          "len": 4194304,
+          "cid": "bafkreifsejtnmtah77izvplaqhqjna3pcndojimw4izj7bsdcxeomvdbw4",
+          "status": 201,
+          "elapsed": 0.481,
+          "resp": "[REDACTED]"
+        },
+        {
+          "index": 1,
+          "len": 4194304,
+          "cid": "bafkreicq4zdasdolvsl27f7susuedqzblddg3mnmtznceqsbadtmzvhusi",
+          "status": 201,
+          "elapsed": 0.579,
+          "resp": "[REDACTED]"
+        },
+        {
+          "index": 2,
+          "len": 4194304,
+          "cid": "bafkreihe64uqk2optkacn5kdelt2mf37z7xfxgot5c7tyetbornpibvcua",
+          "status": 201,
+          "elapsed": 0.55,
+          "resp": "[REDACTED]"
+        },
+        {
+          "index": 3,
+          "len": 4194304,
+          "cid": "bafkreidwfog22hbjtnvzwifykxw2gx6d2255byvyquxeriwfpvllptrjqe",
+          "status": 201,
+          "elapsed": 0.523,
+          "resp": "[REDACTED]"
+        },
+        {
+          "index": 4,
+          "len": 4194304,
+          "cid": "bafkreie6jqumr3tldzze7ni7iv5eciqfmvzzcbnaf46ddum6e3nms3k36e",
+          "status": 201,
+          "elapsed": 0.519,
+          "resp": "[REDACTED]"
+        }
+      ],
+      "chunk_count": 5,
+      "head_first_chunk": {
+        "status": 200,
+        "len": 6,
+        "sha256_match": false
+      },
+      "commit": {
+        "status": 200,
+        "elapsed": 0.37,
+        "resp": "[REDACTED]"
+      },
+      "upload_seconds": 3.57,
+      "upload_Bps": 5874375.4,
+      "local_chunk_cids": [
+        "bafkreifsejtnmtah77izvplaqhqjna3pcndojimw4izj7bsdcxeomvdbw4",
+        "bafkreicq4zdasdolvsl27f7susuedqzblddg3mnmtznceqsbadtmzvhusi",
+        "bafkreihe64uqk2optkacn5kdelt2mf37z7xfxgot5c7tyetbornpibvcua",
+        "..."
+      ],
+      "entry": {
+        "1": "[REDACTED_ID]",
+        "3": "[REDACTED_ID]",
+        "4": "hc-audit-20m-202611222050.bin",
+        "5": "/hc-audit-20m-202611222050.bin",
+        "6": "application/octet-stream",
+        "7": 20971520,
+        "8": 40,
+        "9": 1795351817500,
+        "10": 1795351817500,
+        "24": "bafybeia4uantfzxv25vtf2lmxelb3qtynvj6zdxfns3qmfl3co235akez4",
+        "31": "hcaudit20m202611222050 bin"
+      }
+    },
+    {
+      "file": "hc-test-image.png",
+      "name": "hc-audit-image-202611222050.png",
+      "size": 339211,
+      "sha256": "a6c42293f09b0b6137cbfb528ba2e09cd7fe5bf4663983845b6819640c70bf33",
+      "md5": "bb5b57d5792d31d31d88a24a28a073cd",
+      "mime": "image/png",
+      "create_upload_task": {
+        "grpc_status": "0",
+        "grpc_message": "",
+        "http": 200
+      },
+      "upload_task": {
+        "upload_address": "https://simple-file-proxy.2dland.cn/int/blocks",
+        "task_prefix": "[REDACTED]",
+        "block_size": 4194304,
+        "block_hash_type": 18,
+        "block_version": 1,
+        "block_codec": 85,
+        "created": null,
+        "has_s3_credentials": false,
+        "endpoint": null
+      },
+      "chunks": [
+        {
+          "index": 0,
+          "len": 339211,
+          "cid": "bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm",
+          "status": 201,
+          "elapsed": 0.37,
+          "resp": "[REDACTED]"
+        }
+      ],
+      "chunk_count": 1,
+      "head_first_chunk": {
+        "status": 200,
+        "len": 6,
+        "sha256_match": false
+      },
+      "commit": {
+        "status": 200,
+        "elapsed": 0.258,
+        "resp": "[REDACTED]"
+      },
+      "upload_seconds": 1.08,
+      "upload_Bps": 314084.3,
+      "local_chunk_cids": [
+        "bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm"
+      ],
+      "entry": {
+        "1": "[REDACTED_ID]",
+        "3": "[REDACTED_ID]",
+        "4": "hc-audit-image-202611222050.png",
+        "5": "/hc-audit-image-202611222050.png",
+        "6": "application/octet-stream",
+        "7": 339211,
+        "8": 40,
+        "9": 1795351819881,
+        "10": 1795351819881,
+        "24": "bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm",
+        "31": "hcauditimage202611222050 png"
+      }
+    },
+    {
+      "file": "hc-test-video.mp4",
+      "name": "hc-audit-video-202611222050.mp4",
+      "size": 1356,
+      "sha256": "77db95f7d9562b0e1bc117a2b87739b21ae72c8540dbbd0fa20dbee7e81d55eb",
+      "md5": "89de7c56fc19392e1ec0d9bfeeffff17",
+      "mime": "video/mp4",
+      "create_upload_task": {
+        "grpc_status": "0",
+        "grpc_message": "",
+        "http": 200
+      },
+      "upload_task": {
+        "upload_address": "https://simple-file-proxy.2dland.cn/int/blocks",
+        "task_prefix": "[REDACTED]",
+        "block_size": 4194304,
+        "block_hash_type": 18,
+        "block_version": 1,
+        "block_codec": 85,
+        "created": null,
+        "has_s3_credentials": false,
+        "endpoint": null
+      },
+      "chunks": [
+        {
+          "index": 0,
+          "len": 1356,
+          "cid": "bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m",
+          "status": 201,
+          "elapsed": 0.208,
+          "resp": "[REDACTED]"
+        }
+      ],
+      "chunk_count": 1,
+      "head_first_chunk": {
+        "status": 200,
+        "len": 6,
+        "sha256_match": false
+      },
+      "commit": {
+        "status": 200,
+        "elapsed": 0.279,
+        "resp": "[REDACTED]"
+      },
+      "upload_seconds": 0.93,
+      "upload_Bps": 1458.1,
+      "local_chunk_cids": [
+        "bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m"
+      ],
+      "entry": {
+        "1": "[REDACTED_ID]",
+        "3": "[REDACTED_ID]",
+        "4": "hc-audit-video-202611222050.mp4",
+        "5": "/hc-audit-video-202611222050.mp4",
+        "6": "application/octet-stream",
+        "7": 1356,
+        "8": 40,
+        "9": 1795351822108,
+        "10": 1795351822108,
+        "24": "bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m",
+        "31": "hcauditvideo202611222050 mp4"
+      }
+    }
+  ],
+  "finished": "2026-11-22T20:50:24+0800"
+}

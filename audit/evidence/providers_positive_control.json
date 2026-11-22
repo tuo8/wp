@@ -1,0 +1,34 @@
+[
+  {
+    "cid": "bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey",
+    "http": 200,
+    "provider_count": 0,
+    "body_head": "{\"Providers\":[]}",
+    "label": "small_txt_raw",
+    "is_control": false
+  },
+  {
+    "cid": "bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm",
+    "http": 200,
+    "provider_count": 0,
+    "body_head": "{\"Providers\":[]}",
+    "label": "png_raw",
+    "is_control": false
+  },
+  {
+    "cid": "bafybeia4uantfzxv25vtf2lmxelb3qtynvj6zdxfns3qmfl3co235akez4",
+    "http": 200,
+    "provider_count": 0,
+    "body_head": "{\"Providers\":[]}",
+    "label": "20m_root_dagpb",
+    "is_control": false
+  },
+  {
+    "cid": "bafkreiem4twkqzsq2aj4shbycd4yvoj2cx72vezicletlhi7dijjciqpui",
+    "http": 200,
+    "provider_count": 9,
+    "body_head": "{\"Providers\":[{\"Addrs\":[\"/dns4/bitswap.filebase.io/tcp/443/wss\",\"/dns4/bitswap.filebase.io/tcp/4001\",\"/dns4/bitswap.filebase.io/udp/4001/quic-v1\",\"/dns6/bitswap.filebase.io/tcp/443/wss\",\"/dns6/bitswap",
+    "label": "hello_world_docs",
+    "is_control": true
+  }
+]

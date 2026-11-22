@@ -1,0 +1,526 @@
+{
+  "hc-audit-small-202611222050.txt": {
+    "identity": "[REDACTED_ID]",
+    "expect_sha256": "d99a7997a3e1221af95c8c755e63b44d7c06a4bc32e91aeaacb3a48f97302326",
+    "expect_size": 4157,
+    "slices_grpc": {
+      "status": "0",
+      "message": "",
+      "count": 1
+    },
+    "slice_shape": {
+      "identity": "bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey",
+      "url_redacted": "https://slices.qzy.xyz/ipfs/blocks/2/64/bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey?auth_key=[REDACTED]&session=[REDACTED]",
+      "host": "slices.qzy.xyz",
+      "encrypt": 100,
+      "store_type": null
+    },
+    "slices_download": {
+      "count": 1,
+      "seconds": 0.35,
+      "bytes": 4157,
+      "Bps": 12042.2,
+      "sha256": "09030c86ea996eccd9099c015fa9585516299b7edbbf4df0f2fb5130b5dec6b3",
+      "match_plain": false,
+      "per_slice": [
+        {
+          "idx": 0,
+          "status": 200,
+          "len": 4157,
+          "elapsed": 0.345
+        }
+      ],
+      "headers_sample": {
+        "Server": "Byte-nginx",
+        "Content-Type": "application/octet-stream",
+        "Content-Length": "4157",
+        "Age": "1",
+        "Etag": "\"bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey\"",
+        "Via": "cache48.sxmp,cache07.jlcccu13",
+        "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS",
+        "X-Response-Cinfo": "116.95.146.173",
+        "X-Tt-Trace-Tag": "id=5",
+        "Vary": "Origin"
+      },
+      "xor_key_tested": 100,
+      "match_after_xor_key": true,
+      "sha256_after_xor_key": "d99a7997a3e1221af95c8c755e63b44d7c06a4bc32e91aeaacb3a48f97302326",
+      "match_after_xor75": false
+    },
+    "direct": {
+      "status": "0",
+      "message": "",
+      "url_redacted": "https://ipfs-gateway.qzy.xyz/file/bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey/[REDACTED_ID]/hc-audit-small-202611222050.txt?auth_key=[REDACTED]&session=[REDACTED]&filename=[REDACTED]",
+      "host": "ipfs-gateway.qzy.xyz",
+      "expire_at": 1795359113,
+      "encrypt": null,
+      "store_type": null,
+      "file_size": 4157,
+      "content_identity": "bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey",
+      "download": {
+        "status": 200,
+        "bytes": 4157,
+        "seconds": 0.5,
+        "sha256": "d99a7997a3e1221af95c8c755e63b44d7c06a4bc32e91aeaacb3a48f97302326",
+        "match_plain": true,
+        "match_after_xor75": false,
+        "headers": {
+          "Server": "Byte-nginx",
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "4157",
+          "Accept-Ranges": "bytes",
+          "Age": "27",
+          "Etag": "\"bafkreigztj4zpi7beinpsxemovpghncnpqdkjpbs5enovlftushzombdey\"",
+          "X-Bdcdn-Cache-Status": "TCP_HIT",
+          "via": "cache08.hdcu"
+        }
+      }
+    },
+    "range": {
+      "status": 206,
+      "len": 100,
+      "content_range": "bytes 100-199/4157",
+      "accept_ranges": "bytes"
+    },
+    "file": "hc-audit-small-202611222050.txt"
+  },
+  "hc-audit-1m-202611222050.bin": {
+    "identity": "[REDACTED_ID]",
+    "expect_sha256": "ce443b404acfb5f3f787381daebd7b837482606f1bee59a23de5965dd8c51fcc",
+    "expect_size": 1048576,
+    "slices_grpc": {
+      "status": "0",
+      "message": "",
+      "count": 1
+    },
+    "slice_shape": {
+      "identity": "bafkreigoiq5uaswpwxz7pbzydwxl264dosbga3y35zm2eppfszo5rri7zq",
+      "url_redacted": "https://slices.qzy.xyz/ipfs/blocks/2/37/bafkreigoiq5uaswpwxz7pbzydwxl264dosbga3y35zm2eppfszo5rri7zq?auth_key=[REDACTED]&session=[REDACTED]",
+      "host": "slices.qzy.xyz",
+      "encrypt": 55,
+      "store_type": null
+    },
+    "slices_download": {
+      "count": 1,
+      "seconds": 0.31,
+      "bytes": 1048576,
+      "Bps": 3329996.7,
+      "sha256": "197908e74ec0d0ece55c60445fba30d19a5891c2cd7b8bacffd9ca99edb7199e",
+      "match_plain": false,
+      "per_slice": [
+        {
+          "idx": 0,
+          "status": 200,
+          "len": 1048576,
+          "elapsed": 0.315
+        }
+      ],
+      "headers_sample": {
+        "Server": "Byte-nginx",
+        "Content-Type": "application/octet-stream",
+        "Content-Length": "1048576",
+        "Age": "0",
+        "Etag": "\"bafkreigoiq5uaswpwxz7pbzydwxl264dosbga3y35zm2eppfszo5rri7zq\"",
+        "Via": "cache07.sjzmp,cache06.jlcccu13",
+        "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS",
+        "X-Response-Cinfo": "116.95.146.173",
+        "X-Tt-Trace-Tag": "id=5",
+        "Vary": "Origin"
+      },
+      "xor_key_tested": 55,
+      "match_after_xor_key": true,
+      "sha256_after_xor_key": "ce443b404acfb5f3f787381daebd7b837482606f1bee59a23de5965dd8c51fcc",
+      "match_after_xor75": false
+    },
+    "direct": {
+      "status": "0",
+      "message": "",
+      "url_redacted": "https://ipfs-gateway.qzy.xyz/file/bafkreigoiq5uaswpwxz7pbzydwxl264dosbga3y35zm2eppfszo5rri7zq/[REDACTED_ID]/hc-audit-1m-202611222050.bin?auth_key=[REDACTED]&session=[REDACTED]&filename=[REDACTED]",
+      "host": "ipfs-gateway.qzy.xyz",
+      "expire_at": 1795359115,
+      "encrypt": null,
+      "store_type": null,
+      "file_size": 1048576,
+      "content_identity": "bafkreigoiq5uaswpwxz7pbzydwxl264dosbga3y35zm2eppfszo5rri7zq",
+      "download": {
+        "status": 200,
+        "bytes": 1048576,
+        "seconds": 0.67,
+        "sha256": "ce443b404acfb5f3f787381daebd7b837482606f1bee59a23de5965dd8c51fcc",
+        "match_plain": true,
+        "match_after_xor75": false,
+        "headers": {
+          "Server": "Byte-nginx",
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "1048576",
+          "Accept-Ranges": "bytes",
+          "Age": "0",
+          "Etag": "\"bafkreigoiq5uaswpwxz7pbzydwxl264dosbga3y35zm2eppfszo5rri7zq\"",
+          "Via": "cache93.tzmp,cache05.hdcu",
+          "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS"
+        }
+      }
+    },
+    "range": {
+      "status": 206,
+      "len": 100,
+      "content_range": "bytes 100-199/1048576",
+      "accept_ranges": "bytes"
+    },
+    "file": "hc-audit-1m-202611222050.bin"
+  },
+  "hc-audit-4m-202611222050.bin": {
+    "identity": "[REDACTED_ID]",
+    "expect_sha256": "cc3de6b622017542c89e168968839446a29f60df7344d313cbdec70b50bee2fe",
+    "expect_size": 4194304,
+    "slices_grpc": {
+      "status": "0",
+      "message": "",
+      "count": 1
+    },
+    "slice_shape": {
+      "identity": "bafkreigmhxtlmiqbovbmrhqwrfuihfcgukpwbx3titjrhs66y4fvbpxc7y",
+      "url_redacted": "https://slices.qzy.xyz/ipfs/blocks/2/63/bafkreigmhxtlmiqbovbmrhqwrfuihfcgukpwbx3titjrhs66y4fvbpxc7y?auth_key=[REDACTED]&session=[REDACTED]",
+      "host": "slices.qzy.xyz",
+      "encrypt": 99,
+      "store_type": null
+    },
+    "slices_download": {
+      "count": 1,
+      "seconds": 0.55,
+      "bytes": 4194304,
+      "Bps": 7666770.1,
+      "sha256": "41a230ca5ea0cc9dbac506cb146808cff8c79836bc1fa0ef1ce59a76ba38b7c4",
+      "match_plain": false,
+      "per_slice": [
+        {
+          "idx": 0,
+          "status": 200,
+          "len": 4194304,
+          "elapsed": 0.546
+        }
+      ],
+      "headers_sample": {
+        "Server": "Byte-nginx",
+        "Content-Type": "application/octet-stream",
+        "Content-Length": "4194304",
+        "Age": "0",
+        "Etag": "\"bafkreigmhxtlmiqbovbmrhqwrfuihfcgukpwbx3titjrhs66y4fvbpxc7y\"",
+        "Via": "cache55.sjzmp,cache07.jlcccu13",
+        "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS",
+        "X-Response-Cinfo": "116.95.146.173",
+        "X-Tt-Trace-Tag": "id=5",
+        "Vary": "Origin"
+      },
+      "xor_key_tested": 99,
+      "match_after_xor_key": true,
+      "sha256_after_xor_key": "cc3de6b622017542c89e168968839446a29f60df7344d313cbdec70b50bee2fe",
+      "match_after_xor75": false
+    },
+    "direct": {
+      "status": "0",
+      "message": "",
+      "url_redacted": "https://ipfs-gateway.qzy.xyz/file/bafkreigmhxtlmiqbovbmrhqwrfuihfcgukpwbx3titjrhs66y4fvbpxc7y/[REDACTED_ID]/hc-audit-4m-202611222050.bin?auth_key=[REDACTED]&session=[REDACTED]&filename=[REDACTED]",
+      "host": "ipfs-gateway.qzy.xyz",
+      "expire_at": 1795359117,
+      "encrypt": null,
+      "store_type": null,
+      "file_size": 4194304,
+      "content_identity": "bafkreigmhxtlmiqbovbmrhqwrfuihfcgukpwbx3titjrhs66y4fvbpxc7y",
+      "download": {
+        "status": 200,
+        "bytes": 4194304,
+        "seconds": 0.94,
+        "sha256": "cc3de6b622017542c89e168968839446a29f60df7344d313cbdec70b50bee2fe",
+        "match_plain": true,
+        "match_after_xor75": false,
+        "headers": {
+          "Server": "Byte-nginx",
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "4194304",
+          "Accept-Ranges": "bytes",
+          "Age": "1",
+          "Etag": "\"bafkreigmhxtlmiqbovbmrhqwrfuihfcgukpwbx3titjrhs66y4fvbpxc7y\"",
+          "Via": "cache39.czmp,cache08.hdcu",
+          "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS"
+        }
+      }
+    },
+    "range": {
+      "status": 206,
+      "len": 100,
+      "content_range": "bytes 100-199/4194304",
+      "accept_ranges": "bytes"
+    },
+    "file": "hc-audit-4m-202611222050.bin"
+  },
+  "hc-audit-20m-202611222050.bin": {
+    "identity": "[REDACTED_ID]",
+    "expect_sha256": "38990a5b2d0cd1e6c978e8477eb3a34da47298965b8fc458ebcfc0114f4bf4b3",
+    "expect_size": 20971520,
+    "slices_grpc": {
+      "status": "0",
+      "message": "",
+      "count": 5
+    },
+    "slice_shape": {
+      "identity": "bafkreifsejtnmtah77izvplaqhqjna3pcndojimw4izj7bsdcxeomvdbw4",
+      "url_redacted": "https://slices.qzy.xyz/ipfs/blocks/2/62/bafkreifsejtnmtah77izvplaqhqjna3pcndojimw4izj7bsdcxeomvdbw4?auth_key=[REDACTED]&session=[REDACTED]",
+      "host": "slices.qzy.xyz",
+      "encrypt": 98,
+      "store_type": null
+    },
+    "slices_download": {
+      "count": 5,
+      "seconds": 3.08,
+      "bytes": 20971520,
+      "Bps": 6809368.0,
+      "sha256": "48bca879da1efdb5d061ffb1d6a37e01793d002d0e8d96404105e8bbf91c088e",
+      "match_plain": false,
+      "per_slice": [
+        {
+          "idx": 0,
+          "status": 200,
+          "len": 4194304,
+          "elapsed": 0.609
+        },
+        {
+          "idx": 1,
+          "status": 200,
+          "len": 4194304,
+          "elapsed": 0.652
+        },
+        {
+          "idx": 2,
+          "status": 200,
+          "len": 4194304,
+          "elapsed": 0.592
+        },
+        {
+          "...": 2
+        }
+      ],
+      "headers_sample": {
+        "Server": "Byte-nginx",
+        "Content-Type": "application/octet-stream",
+        "Content-Length": "4194304",
+        "Age": "0",
+        "Etag": "\"bafkreie6jqumr3tldzze7ni7iv5eciqfmvzzcbnaf46ddum6e3nms3k36e\"",
+        "Via": "cache18.sjzmp,cache06.jlcccu13",
+        "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS",
+        "X-Response-Cinfo": "116.95.146.173",
+        "X-Tt-Trace-Tag": "id=5",
+        "Vary": "Origin"
+      },
+      "xor_key_tested": 98,
+      "match_after_xor_key": false,
+      "match_after_xor75": false
+    },
+    "direct": {
+      "status": "0",
+      "message": "",
+      "url_redacted": "https://ipfs-gateway.qzy.xyz/file/bafybeia4uantfzxv25vtf2lmxelb3qtynvj6zdxfns3qmfl3co235akez4/[REDACTED_ID]/hc-audit-20m-202611222050.bin?auth_key=[REDACTED]&session=[REDACTED]&filename=[REDACTED]",
+      "host": "ipfs-gateway.qzy.xyz",
+      "expire_at": 1795359122,
+      "encrypt": null,
+      "store_type": null,
+      "file_size": 20971520,
+      "content_identity": "bafybeia4uantfzxv25vtf2lmxelb3qtynvj6zdxfns3qmfl3co235akez4",
+      "download": {
+        "status": 200,
+        "bytes": 20971520,
+        "seconds": 2.47,
+        "sha256": "38990a5b2d0cd1e6c978e8477eb3a34da47298965b8fc458ebcfc0114f4bf4b3",
+        "match_plain": true,
+        "match_after_xor75": false,
+        "headers": {
+          "Server": "Byte-nginx",
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "20971520",
+          "Accept-Ranges": "bytes",
+          "Age": "1",
+          "Etag": "\"bafybeia4uantfzxv25vtf2lmxelb3qtynvj6zdxfns3qmfl3co235akez4\"",
+          "Via": "cache36.sxmp,cache03.hdcu",
+          "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS"
+        }
+      }
+    },
+    "range": {
+      "status": 206,
+      "len": 100,
+      "content_range": "bytes 100-199/20971520",
+      "accept_ranges": "bytes"
+    },
+    "file": "hc-audit-20m-202611222050.bin"
+  },
+  "hc-audit-image-202611222050.png": {
+    "identity": "[REDACTED_ID]",
+    "expect_sha256": "a6c42293f09b0b6137cbfb528ba2e09cd7fe5bf4663983845b6819640c70bf33",
+    "expect_size": 339211,
+    "slices_grpc": {
+      "status": "0",
+      "message": "",
+      "count": 1
+    },
+    "slice_shape": {
+      "identity": "bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm",
+      "url_redacted": "https://slices.qzy.xyz/ipfs/blocks/2/37/bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm?auth_key=[REDACTED]&session=[REDACTED]",
+      "host": "slices.qzy.xyz",
+      "encrypt": 55,
+      "store_type": null
+    },
+    "slices_download": {
+      "count": 1,
+      "seconds": 0.28,
+      "bytes": 339211,
+      "Bps": 1196575.0,
+      "sha256": "bc2131b5ebf53db7b818b0bac39d027ebe6752f0f8247013abe427432fcffd11",
+      "match_plain": false,
+      "per_slice": [
+        {
+          "idx": 0,
+          "status": 200,
+          "len": 339211,
+          "elapsed": 0.283
+        }
+      ],
+      "headers_sample": {
+        "Server": "Byte-nginx",
+        "Content-Type": "application/octet-stream",
+        "Content-Length": "339211",
+        "Age": "2",
+        "Etag": "\"bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm\"",
+        "Via": "cache33.czmp,cache07.jlcccu13",
+        "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS",
+        "X-Response-Cinfo": "116.95.146.173",
+        "X-Tt-Trace-Tag": "id=5",
+        "Vary": "Origin"
+      },
+      "xor_key_tested": 55,
+      "match_after_xor_key": true,
+      "sha256_after_xor_key": "a6c42293f09b0b6137cbfb528ba2e09cd7fe5bf4663983845b6819640c70bf33",
+      "match_after_xor75": false
+    },
+    "direct": {
+      "status": "0",
+      "message": "",
+      "url_redacted": "https://ipfs-gateway.qzy.xyz/file/bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm/[REDACTED_ID]/hc-audit-image-202611222050.png?auth_key=[REDACTED]&session=[REDACTED]&filename=[REDACTED]",
+      "host": "ipfs-gateway.qzy.xyz",
+      "expire_at": 1795359126,
+      "encrypt": null,
+      "store_type": null,
+      "file_size": 339211,
+      "content_identity": "bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm",
+      "download": {
+        "status": 200,
+        "bytes": 339211,
+        "seconds": 0.77,
+        "sha256": "a6c42293f09b0b6137cbfb528ba2e09cd7fe5bf4663983845b6819640c70bf33",
+        "match_plain": true,
+        "match_after_xor75": false,
+        "headers": {
+          "Server": "Byte-nginx",
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "339211",
+          "Accept-Ranges": "bytes",
+          "Age": "2",
+          "Etag": "\"bafkreifgyqrjh4e3bnqtps73kkf2fye4277fx5dghgbyiw3idfsay4f7gm\"",
+          "Via": "cache14.sxmp,cache06.hdcu",
+          "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS"
+        }
+      }
+    },
+    "range": {
+      "status": 206,
+      "len": 100,
+      "content_range": "bytes 100-199/339211",
+      "accept_ranges": "bytes"
+    },
+    "file": "hc-audit-image-202611222050.png"
+  },
+  "hc-audit-video-202611222050.mp4": {
+    "identity": "[REDACTED_ID]",
+    "expect_sha256": "77db95f7d9562b0e1bc117a2b87739b21ae72c8540dbbd0fa20dbee7e81d55eb",
+    "expect_size": 1356,
+    "slices_grpc": {
+      "status": "0",
+      "message": "",
+      "count": 1
+    },
+    "slice_shape": {
+      "identity": "bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m",
+      "url_redacted": "https://slices.qzy.xyz/ipfs/blocks/2/76/bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m?auth_key=[REDACTED]&session=[REDACTED]",
+      "host": "slices.qzy.xyz",
+      "encrypt": 118,
+      "store_type": null
+    },
+    "slices_download": {
+      "count": 1,
+      "seconds": 0.11,
+      "bytes": 1356,
+      "Bps": 12255.3,
+      "sha256": "b343a0c198c3248938285c26335758c8f52b27762ba489ec4b0d7146bed83ca3",
+      "match_plain": false,
+      "per_slice": [
+        {
+          "idx": 0,
+          "status": 200,
+          "len": 1356,
+          "elapsed": 0.111
+        }
+      ],
+      "headers_sample": {
+        "Server": "Byte-nginx",
+        "Content-Type": "application/octet-stream",
+        "Content-Length": "1356",
+        "Age": "0",
+        "Etag": "\"bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m\"",
+        "Via": "cache04.czmp,cache07.jlcccu13",
+        "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS",
+        "X-Response-Cinfo": "116.95.146.173",
+        "X-Tt-Trace-Tag": "id=5",
+        "Vary": "Origin"
+      },
+      "xor_key_tested": 118,
+      "match_after_xor_key": true,
+      "sha256_after_xor_key": "77db95f7d9562b0e1bc117a2b87739b21ae72c8540dbbd0fa20dbee7e81d55eb",
+      "match_after_xor75": false
+    },
+    "direct": {
+      "status": "0",
+      "message": "",
+      "url_redacted": "https://ipfs-gateway.qzy.xyz/file/bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m/[REDACTED_ID]/hc-audit-video-202611222050.mp4?auth_key=[REDACTED]&session=[REDACTED]&filename=[REDACTED]",
+      "host": "ipfs-gateway.qzy.xyz",
+      "expire_at": 1795359128,
+      "encrypt": null,
+      "store_type": null,
+      "file_size": 1356,
+      "content_identity": "bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m",
+      "download": {
+        "status": 200,
+        "bytes": 1356,
+        "seconds": 0.46,
+        "sha256": "77db95f7d9562b0e1bc117a2b87739b21ae72c8540dbbd0fa20dbee7e81d55eb",
+        "match_plain": true,
+        "match_after_xor75": false,
+        "headers": {
+          "Server": "Byte-nginx",
+          "Content-Type": "application/octet-stream",
+          "Content-Length": "1356",
+          "Accept-Ranges": "bytes",
+          "Age": "0",
+          "Etag": "\"bafkreidx3ok7pwkwfmhbxqixuk4hoonsdltszbka3o6q7iqnx3t6qhkv5m\"",
+          "Via": "cache22.sjzmp,cache05.hdcu",
+          "X-Bdcdn-Cache-Status": "TCP_MISS,TCP_MISS"
+        }
+      }
+    },
+    "range": {
+      "status": 206,
+      "len": 100,
+      "content_range": "bytes 100-199/1356",
+      "accept_ranges": "bytes"
+    },
+    "file": "hc-audit-video-202611222050.mp4"
+  }
+}
