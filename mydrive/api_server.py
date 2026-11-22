@@ -21,6 +21,7 @@ import json
 import time
 import base64
 import hashlib
+import tempfile
 from typing import Optional, List, Dict
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query, Request, Response, Body
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse, HTMLResponse
@@ -338,30 +339,59 @@ async def upload_file(
     sha1: str = Query(""),
     head_sha1: str = Query(""),
 ) -> FileInfo:
-    """
-    Upload a file. The server will:
-    1. Check if content already exists for this user (秒传)
-    2. If not, chunk the file and compute CIDs
-    3. Store chunks (deduplicated by CID)
-    4. Return file metadata
-    """
+    """Stream an upload to disk, enforce size/quota limits, then chunk it."""
     uid = caller_id(request)
-    data = await file.read()
-
-    # Quota enforcement (synced with VIP/SVIP membership tier)
     quota = auth.get_quota(uid) if uid else {"quota": 0, "used": 0}
     eff_quota = int(quota.get("quota") or 0)
     cm = _commercial()
     if uid and cm:
         eff_quota = max(eff_quota, int(cm.get_membership(uid).get("storage_quota_bytes", 0)))
-    if uid and eff_quota and quota["used"] + len(data) > eff_quota:
-        raise HTTPException(status_code=413, detail="超出当前会员存储空间配额，请清理空间或升级 VIP")
 
-    meta = engine.chunk_data(data, name=file.filename or "upload", parent=parent, user_id=uid or "anonymous")
-    if uid:
-        # Quota counts logical file size, so N copies of one blob count N times.
-        auth.update_usage(uid, meta.size)
-    return meta_to_info(meta)
+    try:
+        max_upload = max(0, int(os.environ.get("MAX_UPLOAD_BYTES", str(10 * 1024 ** 3))))
+    except (TypeError, ValueError):
+        max_upload = 10 * 1024 ** 3
+    temp_dir = os.environ.get("UPLOAD_TEMP_DIR") or None
+    if temp_dir:
+        os.makedirs(temp_dir, exist_ok=True)
+    upload_name = Path((file.filename or "upload").replace("\\", "/")).name or "upload"
+    temp_path = None
+    size = 0
+    reserved = False
+    stored = False
+    try:
+        with tempfile.NamedTemporaryFile(mode="wb", delete=False, dir=temp_dir, suffix=".mydrive-upload") as tmp:
+            temp_path = tmp.name
+            while True:
+                block = await file.read(1024 * 1024)
+                if not block:
+                    break
+                size += len(block)
+                if max_upload and size > max_upload:
+                    raise HTTPException(status_code=413, detail="上传文件超过服务器单文件大小限制")
+                if uid and eff_quota and int(quota.get("used") or 0) + size > eff_quota:
+                    raise HTTPException(status_code=413, detail="超出当前会员存储空间配额，请清理空间或升级 VIP")
+                tmp.write(block)
+
+        if uid:
+            if not auth.reserve_usage(uid, size, eff_quota):
+                raise HTTPException(status_code=413, detail="存储空间不足：并发上传后已超出配额")
+            reserved = True
+
+        meta = engine.chunk_file(temp_path, name=upload_name, parent=parent, user_id=uid or "anonymous")
+        stored = True
+        return meta_to_info(meta)
+    except Exception:
+        if reserved and uid and not stored:
+            auth.update_usage(uid, -size)
+        raise
+    finally:
+        if temp_path and os.path.exists(temp_path):
+            try:
+                os.unlink(temp_path)
+            except OSError:
+                pass
+        await file.close()
 
 
 @app.get("/api/files")

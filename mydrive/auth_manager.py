@@ -379,6 +379,26 @@ class AuthManager:
         conn.commit()
         conn.close()
 
+    def reserve_usage(self, user_id: str, delta_bytes: int, quota_limit: int = 0) -> bool:
+        """Atomically reserve logical storage quota to prevent concurrent over-allocation."""
+        amount = max(0, int(delta_bytes or 0))
+        limit = max(0, int(quota_limit or 0))
+        conn = connect_db(self.db_path)
+        c = conn.cursor()
+        if limit:
+            c.execute(
+                "UPDATE users SET bytes_used = bytes_used + ? "
+                "WHERE user_id = ? AND bytes_used + ? <= ?",
+                (amount, user_id, amount, limit),
+            )
+        else:
+            c.execute("UPDATE users SET bytes_used = bytes_used + ? WHERE user_id = ?",
+                      (amount, user_id))
+        reserved = c.rowcount == 1
+        conn.commit()
+        conn.close()
+        return reserved
+
     # ==================== ACCOUNT LIFECYCLE (v6 PubUser) ====================
 
     def change_password(self, user_id: str, old_password: str, new_password: str) -> dict:
