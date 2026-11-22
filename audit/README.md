@@ -6,6 +6,7 @@
 - 采集者：WorkBuddy 自动化审计代理
 - 对象：本人合法账号 + 自造测试文件；无第三方数据、无压测、无付费操作
 - 目录：`evidence/`（结果）、`scripts/`（代码）、`MANIFEST.json`（逐文件 SHA-256）
+- 文件数：**32 个** = 17 份证据 + 13 个脚本 + 本 README + MANIFEST
 
 ---
 

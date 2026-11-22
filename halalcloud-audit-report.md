@@ -866,6 +866,8 @@ python audit/scripts/ipfs_disposition.py
 
 ### 12.5 证据文件清单（与仓库一一对应）
 
+> `audit/` 共 **32 个文件**：17 份脱敏证据 + 13 个脚本 + README + MANIFEST。逐文件 SHA-256 见 `audit/MANIFEST.json`（30 条，覆盖证据与脚本）。
+
 | 文件 | 内容 |
 |---|---|
 | `audit/MANIFEST.json` | 全部证据/脚本的字节数与 SHA-256，可用于校验未被篡改 |
