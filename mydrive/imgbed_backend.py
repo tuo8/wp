@@ -105,6 +105,7 @@ class ImgBedBackend:
         return body if status == 200 else None
 
     def delete_chunk(self, key: str) -> bool:
+        """Remove the ImgBed file/KV mapping; this legacy API does not purge the Telegram post."""
         if not self.admin_username or not self.admin_password: return False
         try: remote_id = self._remote_id(key)
         except ValueError: return False
