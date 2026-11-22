@@ -396,6 +396,9 @@ class TieredStorageManager:
             )
         """)
         c.execute("CREATE INDEX IF NOT EXISTS idx_chunk_tiers_lru ON chunk_tiers(in_local, last_access_ts)")
+        tier_cols = {row[1] for row in c.execute("PRAGMA table_info(chunk_tiers)")}
+        if "stored_sha256" not in tier_cols:
+            c.execute("ALTER TABLE chunk_tiers ADD COLUMN stored_sha256 TEXT DEFAULT ''")
         conn.commit()
         conn.close()
 
@@ -409,22 +412,24 @@ class TieredStorageManager:
     def compression_enabled(self) -> bool:
         return bool(self.config.get("compression_enabled", False))
 
-    def record_chunk_stored(self, cid: str, raw_size: int, stored_size: int, compressed: bool):
+    def record_chunk_stored(self, cid: str, raw_size: int, stored_size: int, compressed: bool,
+                            stored_sha256: str = ""):
         now = int(time.time())
         conn = sqlite3.connect(str(self.db_path))
         c = conn.cursor()
         c.execute(
             """
-            INSERT INTO chunk_tiers (cid, raw_size, stored_size, compressed, in_local, in_cold, last_access_ts)
-            VALUES (?, ?, ?, ?, 1, 0, ?)
+            INSERT INTO chunk_tiers (cid, raw_size, stored_size, compressed, in_local, in_cold, last_access_ts, stored_sha256)
+            VALUES (?, ?, ?, ?, 1, 0, ?, ?)
             ON CONFLICT(cid) DO UPDATE SET
                 raw_size=excluded.raw_size,
                 stored_size=excluded.stored_size,
                 compressed=excluded.compressed,
                 in_local=1,
-                last_access_ts=excluded.last_access_ts
+                last_access_ts=excluded.last_access_ts,
+                stored_sha256=excluded.stored_sha256
             """,
-            (cid, raw_size, stored_size, 1 if compressed else 0, now),
+            (cid, raw_size, stored_size, 1 if compressed else 0, now, stored_sha256),
         )
         conn.commit()
         conn.close()
@@ -442,53 +447,96 @@ class TieredStorageManager:
         conn.close()
 
     def hydrate_from_cold(self, cid: str) -> Optional[bytes]:
-        """Fetch a cold-only chunk from remote backend and cache locally."""
+        """Fetch and verify a cold-only chunk before atomically caching it locally."""
         if not self.backend:
             return None
-        raw = self.backend.get_chunk(self._cold_key(cid))
-        if raw is None:
-            return None
-        local = self._local_path(cid)
-        local.parent.mkdir(parents=True, exist_ok=True)
-        local.write_bytes(raw)
-        now = int(time.time())
-        conn = sqlite3.connect(str(self.db_path))
-        c = conn.cursor()
-        c.execute(
-            "UPDATE chunk_tiers SET in_local = 1, last_access_ts = ? WHERE cid = ?",
-            (now, cid),
-        )
-        conn.commit()
-        conn.close()
-        if self.config.get("local_cache_max_bytes", 0) > 0:
-            self.enforce_local_cache_limit(exclude_cid=cid)
-        return raw
+        with self._lock:
+            raw = self.backend.get_chunk(self._cold_key(cid))
+            if raw is None:
+                return None
+            conn = sqlite3.connect(str(self.db_path))
+            c = conn.cursor()
+            c.execute("SELECT stored_size, stored_sha256 FROM chunk_tiers WHERE cid = ?", (cid,))
+            row = c.fetchone()
+            conn.close()
+            if row:
+                expected_size = int(row[0] or 0)
+                expected_hash = str(row[1] or "")
+                if expected_size and len(raw) != expected_size:
+                    return None
+                if expected_hash and not hmac.compare_digest(
+                    hashlib.sha256(raw).hexdigest(), expected_hash
+                ):
+                    return None
+            local = self._local_path(cid)
+            local.parent.mkdir(parents=True, exist_ok=True)
+            temp = local.with_name(local.name + ".hydrate.tmp")
+            try:
+                temp.write_bytes(raw)
+                temp.replace(local)
+            finally:
+                if temp.exists():
+                    try:
+                        temp.unlink()
+                    except OSError:
+                        pass
+            now = int(time.time())
+            conn = sqlite3.connect(str(self.db_path))
+            conn.execute(
+                "UPDATE chunk_tiers SET in_local = 1, last_access_ts = ? WHERE cid = ?",
+                (now, cid),
+            )
+            conn.commit()
+            conn.close()
+            if self.config.get("local_cache_max_bytes", 0) > 0:
+                self.enforce_local_cache_limit(exclude_cid=cid)
+            return raw
 
     def offload_chunk(self, cid: str, evict_local: bool = True) -> bool:
-        """Copy a local chunk to cold storage and optionally remove local copy."""
+        """Verify the cold copy and commit its metadata before evicting the hot copy."""
         if not self.backend:
             return False
-        local = self._local_path(cid)
-        if not local.exists():
-            return False
-        data = local.read_bytes()
-        ok = self.backend.put_chunk(self._cold_key(cid), data)
-        if not ok:
-            return False
-        if evict_local:
-            try:
-                local.unlink()
-            except OSError:
-                pass
-        conn = sqlite3.connect(str(self.db_path))
-        c = conn.cursor()
-        c.execute(
-            "UPDATE chunk_tiers SET in_cold = 1, in_local = ? WHERE cid = ?",
-            (0 if evict_local else 1, cid),
-        )
-        conn.commit()
-        conn.close()
-        return True
+        with self._lock:
+            local = self._local_path(cid)
+            if not local.exists():
+                return False
+            data = local.read_bytes()
+            checksum = hashlib.sha256(data).hexdigest()
+            key = self._cold_key(cid)
+            if not self.backend.put_chunk(key, data):
+                return False
+            remote = self.backend.get_chunk(key)
+            if remote is None or len(remote) != len(data) or not hmac.compare_digest(
+                hashlib.sha256(remote).hexdigest(), checksum
+            ):
+                return False
+
+            now = int(time.time())
+            conn = sqlite3.connect(str(self.db_path))
+            c = conn.cursor()
+            c.execute(
+                """INSERT INTO chunk_tiers
+                   (cid, raw_size, stored_size, compressed, in_local, in_cold, last_access_ts, stored_sha256)
+                   VALUES (?, ?, ?, 0, 1, 1, ?, ?)
+                   ON CONFLICT(cid) DO UPDATE SET
+                       in_cold=1, in_local=1, stored_size=excluded.stored_size,
+                       last_access_ts=excluded.last_access_ts, stored_sha256=excluded.stored_sha256""",
+                (cid, len(data), len(data), now, checksum),
+            )
+            conn.commit()
+            conn.close()
+
+            if evict_local:
+                try:
+                    local.unlink()
+                except OSError:
+                    # Both copies remain; the DB already records the verified cold copy.
+                    return True
+                conn = sqlite3.connect(str(self.db_path))
+                conn.execute("UPDATE chunk_tiers SET in_local = 0 WHERE cid = ?", (cid,))
+                conn.commit()
+                conn.close()
+            return True
 
     def enforce_local_cache_limit(self, exclude_cid: str = "") -> dict:
         """Evict oldest local chunks to cold storage until local cache fits quota."""
@@ -553,26 +601,28 @@ class TieredStorageManager:
         return {"offloaded": offloaded, "freed_bytes": freed}
 
     def delete_chunk_everywhere(self, cid: str) -> int:
-        """Delete a chunk from local disk, cold backend, and tier table. Returns freed bytes."""
-        freed = 0
-        local = self._local_path(cid)
-        if local.exists():
-            freed += local.stat().st_size
-            try:
-                local.unlink()
-            except OSError:
-                pass
-        if self.backend:
-            try:
-                self.backend.delete_chunk(self._cold_key(cid))
-            except Exception:
-                pass
-        conn = sqlite3.connect(str(self.db_path))
-        c = conn.cursor()
-        c.execute("DELETE FROM chunk_tiers WHERE cid = ?", (cid,))
-        conn.commit()
-        conn.close()
-        return freed
+        """Delete a no-longer-referenced chunk from local and cold tiers."""
+        with self._lock:
+            freed = 0
+            local = self._local_path(cid)
+            if local.exists():
+                freed += local.stat().st_size
+                try:
+                    local.unlink()
+                except OSError:
+                    return 0
+            if self.backend:
+                try:
+                    self.backend.delete_chunk(self._cold_key(cid))
+                except Exception:
+                    # Keep tier metadata so a failed remote delete can be retried.
+                    return freed
+            conn = sqlite3.connect(str(self.db_path))
+            c = conn.cursor()
+            c.execute("DELETE FROM chunk_tiers WHERE cid = ?", (cid,))
+            conn.commit()
+            conn.close()
+            return freed
 
     def local_cache_bytes(self) -> int:
         total = 0

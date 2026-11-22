@@ -2,12 +2,14 @@
 import os
 import sqlite3
 import tempfile
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
 from auth_manager import AuthManager
 from offline_engine import _validate_download_url
 from share_manager import ShareManager
+from tiered_storage import TieredStorageManager
 
 
 class AuthSecurityTests(unittest.TestCase):
@@ -80,6 +82,68 @@ class SharePasswordTests(unittest.TestCase):
         valid, upgraded = ShareManager._verify_share_password("legacy-share-pass", legacy)
         self.assertTrue(valid)
         self.assertTrue(upgraded.startswith("scrypt$"))
+
+
+class _MemoryColdBackend:
+    kind = "memory"
+    def __init__(self):
+        self.objects = {}
+        self.corrupt_reads = False
+    def put_chunk(self, key, data):
+        self.objects[key] = bytes(data)
+        return True
+    def get_chunk(self, key):
+        data = self.objects.get(key)
+        if data is not None and self.corrupt_reads:
+            return data + b"corrupt"
+        return data
+    def delete_chunk(self, key):
+        return self.objects.pop(key, None) is not None
+    def exists(self, key):
+        return key in self.objects
+
+
+class TieredStorageIntegrityTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(prefix="mydrive-tiered-test-")
+        root = Path(self.tmp.name)
+        (root / "db").mkdir()
+        self.db_path = root / "db" / "index.sqlite"
+        self.chunks_dir = root / "chunks"
+        self.manager = TieredStorageManager(str(root), self.db_path, self.chunks_dir)
+        self.backend = _MemoryColdBackend()
+        self.manager.backend = self.backend
+        self.cid = "bafybeigdyrzt5sfp7udm7hu76v3r2m4j5x6k7q8w9e0a1b2c3d4e5f6g7h"
+        self.data = b"chunk-payload-for-cold-storage-integrity" * 100
+        self.local = self.manager._local_path(self.cid)
+        self.local.parent.mkdir(parents=True, exist_ok=True)
+        self.local.write_bytes(self.data)
+        import hashlib
+        self.manager.record_chunk_stored(self.cid, len(self.data), len(self.data), False,
+                                         hashlib.sha256(self.data).hexdigest())
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_corrupt_cold_copy_never_evicts_local_chunk(self):
+        self.backend.corrupt_reads = True
+        self.assertFalse(self.manager.offload_chunk(self.cid, evict_local=True))
+        self.assertTrue(self.local.exists())
+        import sqlite3
+        conn = sqlite3.connect(self.db_path)
+        row = conn.execute("SELECT in_local, in_cold FROM chunk_tiers WHERE cid=?", (self.cid,)).fetchone()
+        conn.close()
+        self.assertEqual(row, (1, 0))
+
+    def test_verified_offload_and_hydration(self):
+        self.assertTrue(self.manager.offload_chunk(self.cid, evict_local=True))
+        self.assertFalse(self.local.exists())
+        self.backend.corrupt_reads = True
+        self.assertIsNone(self.manager.hydrate_from_cold(self.cid))
+        self.assertFalse(self.local.exists())
+        self.backend.corrupt_reads = False
+        self.assertEqual(self.manager.hydrate_from_cold(self.cid), self.data)
+        self.assertEqual(self.local.read_bytes(), self.data)
 
 
 class OfflineSSRFTests(unittest.TestCase):

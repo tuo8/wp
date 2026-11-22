@@ -694,7 +694,7 @@ class StorageEngine:
             conn.close()
         self._fmt_cache[cid] = int(fmt)
         if hasattr(self, "tiered"):
-            self.tiered.record_chunk_stored(cid, len(data), len(encoded), compressed)
+            self.tiered.record_chunk_stored(cid, len(data), len(encoded), compressed, hashlib.sha256(encoded).hexdigest())
 
     def _chunk_path(self, cid: str) -> Path:
         """Convert CID to a sharded path: chunks/ba/fk/<full_cid>"""
