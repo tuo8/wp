@@ -9,6 +9,20 @@ on:
 jobs:
   python-checks:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: mydrive
+          POSTGRES_USER: mydrive
+          POSTGRES_PASSWORD: mydrive_test_password
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mydrive -d mydrive"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -23,3 +37,10 @@ jobs:
       - name: Security regression tests
         working-directory: mydrive
         run: python -m unittest -v security_regression_test
+      - name: PostgreSQL integration smoke tests
+        working-directory: mydrive
+        env:
+          DATABASE_URL: postgresql://mydrive:mydrive_test_password@localhost:5432/mydrive
+          MYDRIVE_ENV: development
+          MYDRIVE_SECRET: postgres-smoke-test-secret-which-is-long-enough
+        run: python -m unittest -v postgres_smoke_test
