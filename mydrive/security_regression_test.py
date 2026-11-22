@@ -7,6 +7,7 @@ from unittest.mock import patch
 
 from auth_manager import AuthManager
 from offline_engine import _validate_download_url
+from share_manager import ShareManager
 
 
 class AuthSecurityTests(unittest.TestCase):
@@ -68,6 +69,19 @@ class AuthSecurityTests(unittest.TestCase):
         self.assertTrue(self.auth.delete_user(uid, "InitialPass_123")["success"])
 
 
+class SharePasswordTests(unittest.TestCase):
+    def test_scrypt_hash_and_legacy_upgrade(self):
+        stored = ShareManager._hash_share_password("share-secret-phrase")
+        valid, upgrade = ShareManager._verify_share_password("share-secret-phrase", stored)
+        self.assertTrue(valid)
+        self.assertIsNone(upgrade)
+        self.assertFalse(ShareManager._verify_share_password("wrong", stored)[0])
+        legacy = __import__("hashlib").sha256(b"legacy-share-pass").hexdigest()
+        valid, upgraded = ShareManager._verify_share_password("legacy-share-pass", legacy)
+        self.assertTrue(valid)
+        self.assertTrue(upgraded.startswith("scrypt$"))
+
+
 class OfflineSSRFTests(unittest.TestCase):
     def test_private_and_reserved_targets_are_rejected(self):
         targets = [
@@ -95,6 +109,14 @@ class OfflineSSRFTests(unittest.TestCase):
         target = (
             "magnet:?xt=urn:btih:0123456789012345678901234567890123456789"
             "&tr=http%3A%2F%2F127.0.0.1%2Fannounce"
+        )
+        with self.assertRaises(ValueError):
+            _validate_download_url(target)
+
+    def test_private_magnet_webseed_is_rejected(self):
+        target = (
+            "magnet:?xt=urn:btih:0123456789012345678901234567890123456789"
+            "&ws=http%3A%2F%2F169.254.169.254%2Fsecret"
         )
         with self.assertRaises(ValueError):
             _validate_download_url(target)

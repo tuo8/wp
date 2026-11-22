@@ -132,8 +132,8 @@ class AuthManager:
     def register(self, username: str, password: str) -> dict:
         if len(username) < 3:
             return {"success": False, "error": "Username too short"}
-        if len(password) < 6:
-            return {"success": False, "error": "Password too short"}
+        if len(password) < 10:
+            return {"success": False, "error": "Password must be at least 10 characters"}
 
         salt = secrets.token_hex(16)
         pw_hash = self._hash_password(password, salt)
@@ -464,8 +464,12 @@ class AuthManager:
         if not sms or sms[2] or not hmac.compare_digest(str(sms[0]), str(sms_code).strip()) or int(time.time()) > sms[1]:
             conn.close()
             return {"success": False, "error": "Invalid or expired SMS code"}
-        c.execute("UPDATE sms_codes SET used = 1 WHERE phone = ? AND code = ? AND used = 0",
-                  (phone, sms[0]))
+        c.execute(
+            "UPDATE sms_codes SET used = 1 WHERE phone = ? AND code = ? AND used = 0 AND expires_ts >= ?",
+            (phone, sms[0], int(time.time())))
+        if c.rowcount != 1:
+            conn.close()
+            return {"success": False, "error": "Invalid or expired SMS code"}
         new_salt = secrets.token_hex(16)
         new_hash = self._hash_password(new_password, new_salt)
         c.execute("UPDATE users SET password_hash = ?, password_salt = ? WHERE user_id = ?",
@@ -563,6 +567,15 @@ class AuthManager:
         expires = now + max(60, min(int(ttl), 600))
         conn = connect_db(self.db_path)
         c = conn.cursor()
+        c.execute("SELECT COUNT(*) FROM sms_codes WHERE phone = ? AND created_ts >= ?", (phone, now - 3600))
+        if int(c.fetchone()[0] or 0) >= 5:
+            conn.close()
+            return {"success": False, "error": "Too many verification attempts; try again later"}
+        c.execute("SELECT created_ts FROM sms_codes WHERE phone = ? ORDER BY created_ts DESC LIMIT 1", (phone,))
+        latest = c.fetchone()
+        if latest and now - int(latest[0] or 0) < 60:
+            conn.close()
+            return {"success": False, "error": "Please wait before requesting another code"}
         c.execute("DELETE FROM sms_codes WHERE phone = ? AND used = 1", (phone,))
         c.execute(
             "INSERT INTO sms_codes (phone, code, scene, created_ts, expires_ts, used) VALUES (?,?,?,?,?,0)",
@@ -575,16 +588,12 @@ class AuthManager:
         conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
-            "SELECT code, expires_ts, used FROM sms_codes WHERE phone = ? ORDER BY created_ts DESC LIMIT 1",
-            (phone,))
-        row = c.fetchone()
-        if not row or row[2] or row[0] != (code or "").strip() or int(time.time()) > row[1]:
-            conn.close()
-            return False
-        c.execute("UPDATE sms_codes SET used = 1 WHERE phone = ?", (phone,))
+            "UPDATE sms_codes SET used = 1 WHERE phone = ? AND code = ? AND used = 0 AND expires_ts >= ?",
+            ((phone or "").strip(), (code or "").strip(), int(time.time())))
+        valid = c.rowcount == 1
         conn.commit()
         conn.close()
-        return True
+        return valid
 
     # ==================== VALIDATION / QUOTA EXTEND ====================
 

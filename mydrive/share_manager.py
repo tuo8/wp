@@ -11,6 +11,8 @@ import json
 import time
 import uuid
 import hashlib
+import hmac
+import secrets
 import sqlite3
 from pathlib import Path
 from typing import Optional
@@ -19,6 +21,33 @@ from storage_engine import StorageEngine
 
 
 class ShareManager:
+    @staticmethod
+    def _hash_share_password(password: str) -> str:
+        salt = secrets.token_bytes(16)
+        n, r, p = 2 ** 14, 8, 1
+        digest = hashlib.scrypt((password or "").encode("utf-8"), salt=salt,
+                                n=n, r=r, p=p, dklen=32)
+        return f"scrypt${n}${r}${p}${salt.hex()}${digest.hex()}"
+
+    @staticmethod
+    def _verify_share_password(password: str, stored_hash: str):
+        """Verify current scrypt hashes and transparently upgrade legacy SHA-256 hashes."""
+        stored = stored_hash or ""
+        if stored.startswith("scrypt$"):
+            try:
+                _, n, r, p, salt_hex, digest_hex = stored.split("$", 5)
+                expected = bytes.fromhex(digest_hex)
+                actual = hashlib.scrypt((password or "").encode("utf-8"),
+                                        salt=bytes.fromhex(salt_hex), n=int(n),
+                                        r=int(r), p=int(p), dklen=len(expected))
+                return hmac.compare_digest(actual, expected), None
+            except (ValueError, TypeError):
+                return False, None
+        legacy = hashlib.sha256((password or "").encode("utf-8")).hexdigest()
+        if stored and hmac.compare_digest(legacy, stored):
+            return True, ShareManager._hash_share_password(password)
+        return False, None
+
     def __init__(self, engine: StorageEngine):
         self.engine = engine
         self.db_path = engine.db_dir / "share.sqlite"
@@ -94,7 +123,7 @@ class ShareManager:
         pw_hash = ""
         has_password = 0
         if password:
-            pw_hash = hashlib.sha256(password.encode()).hexdigest()
+            pw_hash = self._hash_share_password(password)
             has_password = 1
 
         expire_ts = int(time.time()) + expire_hours * 3600 if expire_hours else 0
@@ -144,9 +173,16 @@ class ShareManager:
         if has_pw:
             if not password:
                 return {"success": False, "error": "Password required"}
-            input_hash = hashlib.sha256(password.encode()).hexdigest()
-            if input_hash != pw_hash:
+            valid_password, upgraded_hash = self._verify_share_password(password, pw_hash)
+            if not valid_password:
                 return {"success": False, "error": "Wrong password"}
+            if upgraded_hash:
+                upgrade_conn = sqlite3.connect(str(self.db_path))
+                upgrade_conn.execute(
+                    "UPDATE shares SET password_hash = ? WHERE share_id = ? AND password_hash = ?",
+                    (upgraded_hash, share_id, pw_hash))
+                upgrade_conn.commit()
+                upgrade_conn.close()
 
         meta = self.engine.get_file_meta(file_identity)
         if not meta:

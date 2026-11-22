@@ -71,9 +71,12 @@ def _validate_public_endpoint(url: str, allowed_schemes=("http", "https", "udp")
 def _validate_download_url(url: str):
     value = (url or "").strip()
     if value.lower().startswith("magnet:"):
-        trackers = parse_qs(urlsplit(value).query).get("tr", [])
-        for tracker in trackers:
-            _validate_public_endpoint(tracker)
+        params = parse_qs(urlsplit(value).query)
+        for tracker in params.get("tr", []):
+            _validate_public_endpoint(tracker, allowed_schemes=("http", "https", "udp"))
+        for source_key in ("ws", "as", "xs"):
+            for source_url in params.get(source_key, []):
+                _validate_public_endpoint(source_url, allowed_schemes=("http", "https"))
         return
     _validate_public_endpoint(value, allowed_schemes=("http", "https"))
 
