@@ -207,14 +207,14 @@ def mount_extra_routes(
     # ==================== TIERED STORAGE & SPACE SAVING ====================
 
     @app.get("/api/storage/tiered/config")
-        _require_admin(request)
     async def get_tiered_config(request: Request):
+        _require_admin(request)
         caller_id_fn(request)
         return engine.tiered.get_public_config()
 
     @app.post("/api/storage/tiered/config")
-        _require_admin(request)
     async def update_tiered_config(req: TieredConfigRequest, request: Request):
+        _require_admin(request)
         caller_id_fn(request)
         updates = {k: v for k, v in (req.model_dump() if hasattr(req, 'model_dump') else req.dict()).items() if v is not None}
         # Preserve existing secret if masked placeholder sent back
@@ -223,22 +223,22 @@ def mount_extra_routes(
         return engine.tiered.save_config(updates)
 
     @app.get("/api/storage/tiered/stats")
-        _require_admin(request)
     async def get_tiered_stats(request: Request):
+        _require_admin(request)
         uid = caller_id_fn(request)
         base = engine.get_storage_stats(user_id=uid)
         tiered = engine.tiered.get_stats()
         return {**base, "tiered": tiered}
 
     @app.post("/api/storage/tiered/offload")
-        _require_admin(request)
     async def offload_cold(request: Request, evict_local: bool = True):
+        _require_admin(request)
         caller_id_fn(request)
         return engine.tiered.offload_all_to_cold(evict_local=evict_local)
 
     @app.post("/api/storage/gc")
-        _require_admin(request)
     async def run_chunk_gc(request: Request):
+        _require_admin(request)
         caller_id_fn(request)
         return engine.gc_chunks()
 
@@ -248,8 +248,8 @@ def mount_extra_routes(
         return engine.empty_trash(user_id=uid)
 
     @app.post("/api/trash/purge-expired")
-        _require_admin(request)
     async def purge_expired_trash(request: Request, days: Optional[int] = None):
+        _require_admin(request)
         caller_id_fn(request)
         return engine.purge_expired_trash(retention_days=days)
 
