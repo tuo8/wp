@@ -741,17 +741,26 @@ loadShare();
         if not commercial.verify_webhook_signature(raw, sig):
             raise HTTPException(status_code=403, detail="Invalid payment webhook signature")
         import json as _json
-        data = _json.loads(raw.decode("utf-8"))
-        order_no = data.get("order_no", "")
         try:
-            res = commercial.mark_order_paid(order_no)
-            if hasattr(auth, 'extend_quota'):
-                try: auth.extend_quota(res['user_id'], int(res.get('membership', {}).get('storage_quota_bytes', 0)))
-                except Exception: pass
+            data = _json.loads(raw.decode("utf-8"))
+        except (UnicodeDecodeError, ValueError):
+            raise HTTPException(status_code=400, detail="Invalid payment callback JSON")
+        if not isinstance(data, dict):
+            raise HTTPException(status_code=400, detail="Invalid payment callback payload")
+        order_no = str(data.get("order_no", "")).strip()
+        if not order_no:
+            raise HTTPException(status_code=400, detail="order_no is required")
+        try:
+            res = commercial.mark_order_paid(
+                order_no,
+                amount_cents=data.get("amount_cents"),
+                currency=data.get("currency"),
+                provider=data.get("provider"),
+            )
             audit.log("order.paid", res["user_id"], order_no, request.client.host if request.client else "", res["plan"])
             return {"ok": True, "order": res}
         except ValueError as e:
-            raise HTTPException(status_code=404, detail=str(e))
+            raise HTTPException(status_code=400, detail=str(e))
 
     @app.get("/api/health")
     async def health_check():

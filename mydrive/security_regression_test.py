@@ -151,9 +151,12 @@ class TieredStorageIntegrityTests(unittest.TestCase):
 class CommercialStateTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory(prefix="mydrive-commercial-test-")
+        self.env = patch.dict(os.environ, {"MYDRIVE_ENV": "development"})
+        self.env.start()
         self.manager = CommercialManager(self.tmp.name)
 
     def tearDown(self):
+        self.env.stop()
         self.tmp.cleanup()
 
     def test_redeem_code_is_one_time(self):
@@ -170,6 +173,29 @@ class CommercialStateTests(unittest.TestCase):
         second = self.manager.mark_order_paid(order["order_no"])
         self.assertEqual(second["status"], "paid")
         self.assertEqual(self.manager.get_membership("buyer-1")["expire_ts"], expiry)
+
+
+    def test_payment_amount_and_currency_must_match_order(self):
+        order = self.manager.create_order("buyer-2", plan="vip", duration_days=30)
+        with self.assertRaises(ValueError):
+            self.manager.mark_order_paid(order["order_no"], amount_cents=order["amount_cents"] - 1, currency="CNY")
+        self.assertEqual(self.manager.list_orders(user_id="buyer-2")[0]["status"], "pending")
+        with self.assertRaises(ValueError):
+            self.manager.mark_order_paid(order["order_no"], amount_cents=order["amount_cents"], currency="USD")
+        paid = self.manager.mark_order_paid(order["order_no"], amount_cents=order["amount_cents"], currency="CNY")
+        self.assertEqual(paid["status"], "paid")
+
+    def test_production_payment_callback_requires_amount_and_currency(self):
+        order = self.manager.create_order("buyer-3", plan="vip", duration_days=30)
+        with patch.dict(os.environ, {"MYDRIVE_ENV": "production"}):
+            with self.assertRaises(ValueError):
+                self.manager.mark_order_paid(order["order_no"])
+
+    def test_order_amount_uses_exact_day_proration(self):
+        order = self.manager.create_order("buyer-4", plan="vip", duration_days=15)
+        self.assertEqual(order["amount_cents"], 995)
+        with self.assertRaises(ValueError):
+            self.manager.create_order("buyer-5", plan="vip", duration_days=0)
 
     def test_webhook_requires_configured_secret(self):
         payload = b'{"order":"demo"}'

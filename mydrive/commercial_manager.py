@@ -13,6 +13,7 @@ Brings PikPak / HalalCloud commercial operations to MyDrive:
 from __future__ import annotations
 
 import hashlib
+import math
 import hmac
 import os
 import secrets
@@ -251,8 +252,10 @@ class CommercialManager:
     def create_order(self, user_id: str, plan: str = "vip", duration_days: int = 30, provider: str = "generic") -> dict:
         if plan not in self.PLAN_PRICES_CENTS:
             raise ValueError("Plan must be vip or svip")
-        months = max(1, round(int(duration_days) / 30))
-        amount_cents = self.PLAN_PRICES_CENTS[plan] * months
+        days = int(duration_days)
+        if days < 1 or days > 3650:
+            raise ValueError("duration_days must be between 1 and 3650")
+        amount_cents = math.ceil(self.PLAN_PRICES_CENTS[plan] * days / 30)
         order_no = f"ORD-{int(time.time())}-{secrets.token_hex(4).upper()}"
         now = int(time.time())
         with self._conn() as c:
@@ -265,7 +268,7 @@ class CommercialManager:
             "order_no": order_no,
             "user_id": user_id,
             "plan": plan,
-            "duration_days": int(duration_days),
+            "duration_days": days,
             "amount_cents": amount_cents,
             "currency": "CNY",
             "status": "pending",
@@ -281,12 +284,27 @@ class CommercialManager:
         expected = hmac.new(secret.encode("utf-8"), payload_bytes, hashlib.sha256).hexdigest()
         return hmac.compare_digest(expected, (signature or "").strip().lower())
 
-    def mark_order_paid(self, order_no: str) -> dict:
+    def mark_order_paid(self, order_no: str, amount_cents: Optional[int] = None,
+                        currency: Optional[str] = None, provider: Optional[str] = None) -> dict:
         now = int(time.time())
+        runtime_mode = os.environ.get("MYDRIVE_ENV", "development").strip().lower()
+        if runtime_mode in ("prod", "production") and (amount_cents is None or not currency):
+            raise ValueError("Signed payment callback must include amount_cents and currency")
         with self._conn() as c:
             row = c.execute("SELECT * FROM payment_orders WHERE order_no = ?", (order_no,)).fetchone()
             if not row:
                 raise ValueError("Order not found")
+            if amount_cents is not None:
+                try:
+                    callback_amount = int(amount_cents)
+                except (TypeError, ValueError):
+                    raise ValueError("Invalid payment amount")
+                if callback_amount != int(row["amount_cents"]):
+                    raise ValueError("Payment amount does not match order")
+            if currency and str(currency).strip().upper() != str(row["currency"]).strip().upper():
+                raise ValueError("Payment currency does not match order")
+            if provider and str(provider).strip().lower() != str(row["provider"]).strip().lower():
+                raise ValueError("Payment provider does not match order")
             if row["status"] == "paid":
                 return dict(row)
             if row["status"] != "pending":
