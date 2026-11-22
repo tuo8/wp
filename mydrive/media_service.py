@@ -20,6 +20,7 @@ import os
 import re
 import shutil
 import sqlite3
+from db_adapter import connect_db
 import subprocess
 import tempfile
 import threading
@@ -92,7 +93,7 @@ class MediaService:
         self._init_db()
 
     def _init_db(self):
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("""
             CREATE TABLE IF NOT EXISTS playback_progress (
@@ -462,7 +463,7 @@ class MediaService:
         quality: str = "original",
     ) -> dict:
         now = int(time.time())
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
             """
@@ -489,7 +490,7 @@ class MediaService:
         }
 
     def get_progress(self, user_id: str, file_identity: str) -> dict:
-        conn = sqlite3.connect(str(self.db_path))
+        conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
             "SELECT position_sec, duration_sec, playback_rate, quality, updated_at "

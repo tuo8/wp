@@ -11,6 +11,8 @@ from offline_engine import _validate_download_url
 from share_manager import ShareManager
 from tiered_storage import TieredStorageManager
 from commercial_manager import CommercialManager
+from offline_engine import OfflineEngine
+from media_service import MediaService
 from db_adapter import PgCursorWrapper, translate_sql_to_pg
 
 
@@ -263,6 +265,28 @@ class DatabaseAdapterTests(unittest.TestCase):
         sql = translate_sql_to_pg("INSERT OR IGNORE INTO test_table (id) VALUES (?)")
         self.assertIn("ON CONFLICT DO NOTHING", sql)
         self.assertIn("%s", sql)
+
+
+class ActiveDatabaseModuleTests(unittest.TestCase):
+    def test_offline_engine_metadata_cache_uses_adapter(self):
+        class FakeAria2:
+            def __init__(self, root):
+                self.download_root = str(Path(root) / "downloads")
+                self.meta_dir = str(Path(root) / "meta")
+        with tempfile.TemporaryDirectory(prefix="offline-adapter-test-") as root:
+            engine = OfflineEngine(None, str(Path(root) / "offline"), FakeAria2(root))
+            metadata = {"name": "example", "size": 123, "files": [{"path": "a.bin", "length": 123}]}
+            engine._meta_cache_put("test-infohash", metadata)
+            self.assertEqual(engine._meta_cache_get("test-infohash")["name"], "example")
+
+    def test_media_service_initializes_database_through_adapter(self):
+        with tempfile.TemporaryDirectory(prefix="media-adapter-test-") as root:
+            service = MediaService(None, root)
+            self.assertTrue(service.db_path.exists())
+            conn = sqlite3.connect(service.db_path)
+            tables = {row[0] for row in conn.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+            conn.close()
+            self.assertIn("playback_progress", tables)
 
 
 class OfflineSSRFTests(unittest.TestCase):
