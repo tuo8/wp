@@ -1,0 +1,15 @@
+# 被剔除的大体积中间产物（不在 lite 包内）
+# 格式: sha256  bytes  path
+# 校验: sha256sum -c EXCLUDED_BINARIES.sha256  （需先把同名文件放回原路径）
+
+10f04598be0ff4b34cbc3e92da79b121a774adbfb842b575f78b15360a873ce6  1024  03_upload/testcorpus/hca-kb1.bin
+eccf552f66656dcbc4b8ffe1ad21f3b334af75eb74ca7060292e83e3f60084b3  102400  03_upload/testcorpus/hca-kb100.bin
+3582c300c7cd7a350b0b726ae18b3c9a64c972b307d48707409520243a1df5a7  1048576  03_upload/testcorpus/hca-mb1.bin
+8d07592271b899683f3758c14459d361855fc430619c22147156ba8e30f8c99e  10485760  03_upload/testcorpus/hca-mb10.bin
+9c490c2186ad312e4c9745b380efe6543b589c755b959d7e68fd46e7c01ba967  104857600  03_upload/testcorpus/hca-mb100.bin
+79f4cbbc67135eb4cd9f519ae6cf658cb4f34d8b845522c521e3aad9ce864052  4194304  03_upload/testcorpus/hca-mb4.bin
+efbbd8606ffc386371d4983ad02b0c557fd79933ddebda2087a88a169e6c41e2  52428800  03_upload/testcorpus/hca-mb50.bin
+10f04598be0ff4b34cbc3e92da79b121a774adbfb842b575f78b15360a873ce6  1024  04_download/app_downloaded_kb1.bin
+efbbd8606ffc386371d4983ad02b0c557fd79933ddebda2087a88a169e6c41e2  52428800  04_download/app_downloaded_mb50.bin
+28b882a812e901e56469722d7423307da1305d2754de76dda3e4438a394a3d08  4194304  05_cid_and_chunks/gb_head_sample.bin
+63bbdbf922160dd203a264c0fb45c982e92ebfa108fed419e2dcd72abe130e51  4663785  05_cid_and_chunks/gb_tail_sample.bin
