@@ -465,13 +465,87 @@ class TieredStorageManager:
         elif self.backend and self.config.get("auto_offload", True) and self.config.get("local_cache_max_bytes", 0) > 0:
             self.enforce_local_cache_limit()
 
+    @property
+    def primary_storage_enabled(self) -> bool:
+        return bool(self.backend is not None and self.config.get("primary_storage", False))
+
+    def store_primary_chunk(self, cid: str, data: bytes, raw_size: int,
+                            compressed: bool = False) -> bool:
+        """Write and read-back verify an authoritative remote block."""
+        if not self.primary_storage_enabled or not self.backend:
+            return False
+        checksum = hashlib.sha256(data).hexdigest()
+        key = self._cold_key(cid)
+        try:
+            if not self.backend.put_chunk(key, data):
+                return False
+            remote = self.backend.get_chunk(key)
+        except Exception:
+            return False
+        if remote is None or len(remote) != len(data) or not hmac.compare_digest(
+            hashlib.sha256(remote).hexdigest(), checksum
+        ):
+            return False
+        now = int(time.time())
+        conn = connect_db(self.db_path)
+        try:
+            conn.execute(
+                """INSERT INTO chunk_tiers
+                   (cid, raw_size, stored_size, compressed, in_local, in_cold,
+                    last_access_ts, stored_sha256, cold_backend)
+                   VALUES (?, ?, ?, ?, 0, 1, ?, ?, ?)
+                   ON CONFLICT(cid) DO UPDATE SET
+                     raw_size=excluded.raw_size, stored_size=excluded.stored_size,
+                     compressed=excluded.compressed, in_local=0, in_cold=1,
+                     last_access_ts=excluded.last_access_ts,
+                     stored_sha256=excluded.stored_sha256,
+                     cold_backend=excluded.cold_backend""",
+                (cid, int(raw_size), len(data), 1 if compressed else 0,
+                 now, checksum, self.backend.kind),
+            )
+            conn.commit()
+        finally:
+            conn.close()
+        return True
+
+    def get_primary_chunk(self, cid: str) -> Optional[bytes]:
+        """Read the authoritative remote block without hydrating it to local disk."""
+        if not self.primary_storage_enabled or not self.backend:
+            return None
+        conn = connect_db(self.db_path)
+        try:
+            row = conn.execute(
+                "SELECT stored_size, stored_sha256, cold_backend, in_cold "
+                "FROM chunk_tiers WHERE cid = ?", (cid,)
+            ).fetchone()
+        finally:
+            conn.close()
+        if not row or not int(row[3] or 0):
+            return None
+        if row[2] and str(row[2]) != self.backend.kind:
+            return None
+        try:
+            data = self.backend.get_chunk(self._cold_key(cid))
+        except Exception:
+            return None
+        if data is None:
+            return None
+        if row[0] and len(data) != int(row[0]):
+            return None
+        if row[1] and not hmac.compare_digest(hashlib.sha256(data).hexdigest(), str(row[1])):
+            return None
+        self.touch(cid)
+        return data
+
     def ensure_primary_chunk(self, cid: str) -> bool:
-        """Retry/verify ImgBed persistence when a local chunk already exists."""
-        if not (self.backend and self.backend.kind == "imgbed" and self.config.get("primary_storage")):
+        """Migrate an existing local block to the remote primary and evict it."""
+        if not self.primary_storage_enabled:
+            return True
+        if self.get_primary_chunk(cid) is not None:
             return True
         if not self._local_path(cid).exists():
             return False
-        return self.offload_chunk(cid, evict_local=False)
+        return self.offload_chunk(cid, evict_local=True)
 
     def touch(self, cid: str):
         now = int(time.time())

@@ -682,19 +682,62 @@ class StorageEngine:
         return meta
 
     def _store_chunk(self, cid: str, data: bytes, fmt: int = CHUNK_FMT_PLAIN):
-        """Store a chunk on disk, named by its CID. Dedup is automatic —
-        if the CID already exists, we don't write again.
+        """Persist a content-addressed block.
 
-        ``fmt`` selects the on-disk encoding (plain vs XOR 0x75). Content is
-        content-addressed by its plaintext, so the CID is identical either way.
+        In primary mode the remote backend is authoritative: the block is
+        uploaded and read-back verified before its metadata is committed.
+        No durable local chunk file is created.
         """
         chunk_path = self._chunk_path(cid)
+        primary = bool(getattr(getattr(self, "tiered", None), "primary_storage_enabled", False))
+
+        if primary:
+            # Migrate an existing local copy lazily, preserving its on-disk encoding.
+            if chunk_path.exists():
+                encoded = chunk_path.read_bytes()
+                existing_fmt = self.chunk_format(cid)
+                compressed = encoded.startswith(b"MZLB") and existing_fmt == CHUNK_FMT_PLAIN
+                raw_size = len(data)
+                if not self.tiered.store_primary_chunk(
+                    cid, encoded, raw_size=raw_size, compressed=compressed
+                ):
+                    raise RuntimeError(f"Primary remote persistence failed for chunk {cid}")
+                try:
+                    chunk_path.unlink()
+                except OSError as exc:
+                    raise RuntimeError(f"Remote copy verified but local cache eviction failed for {cid}") from exc
+            else:
+                encoded = encode_chunk(data, fmt)
+                compressed = False
+                if fmt == CHUNK_FMT_PLAIN and self.tiered.compression_enabled:
+                    encoded, compressed = smart_compress(encoded)
+                if not self.tiered.store_primary_chunk(
+                    cid, encoded, raw_size=len(data), compressed=compressed
+                ):
+                    raise RuntimeError(f"Primary remote persistence failed for chunk {cid}")
+
+            conn = connect_db(self.db_path)
+            c = conn.cursor()
+            try:
+                c.execute(
+                    "INSERT INTO chunks (cid, size, ref_count, create_ts, inline_data, format) "
+                    "VALUES (?, ?, 1, ?, NULL, ?) "
+                    "ON CONFLICT(cid) DO UPDATE SET size=excluded.size, format=excluded.format",
+                    (cid, len(data), int(time.time()), int(fmt)),
+                )
+                conn.commit()
+            finally:
+                conn.close()
+            self._fmt_cache[cid] = int(fmt)
+            return
+
+        # Legacy hot-local / optional cold-tier behavior remains unchanged.
         if chunk_path.exists():
             if hasattr(self, "tiered"):
                 self.tiered.touch(cid)
                 if not self.tiered.ensure_primary_chunk(cid):
                     raise RuntimeError(f"Primary ImgBed persistence retry failed for chunk {cid}")
-            return  # Already stored — this IS the dedup!
+            return
         chunk_path.parent.mkdir(parents=True, exist_ok=True)
         encoded = encode_chunk(data, fmt)
         compressed = False
@@ -702,7 +745,6 @@ class StorageEngine:
             encoded, compressed = smart_compress(encoded)
         chunk_path.write_bytes(encoded)
 
-        # Record in DB
         conn = connect_db(self.db_path)
         c = conn.cursor()
         try:
@@ -712,8 +754,6 @@ class StorageEngine:
                 (cid, len(data), int(time.time()), int(fmt))
             )
             conn.commit()
-        except sqlite3.IntegrityError:
-            pass  # Already exists
         finally:
             conn.close()
         self._fmt_cache[cid] = int(fmt)
@@ -731,6 +771,14 @@ class StorageEngine:
 
     def get_chunk(self, cid: str) -> Optional[bytes]:
         """Retrieve a chunk by its CID (returns plaintext — decoding is automatic)."""
+        if getattr(self.tiered, "primary_storage_enabled", False):
+            remote = self.tiered.get_primary_chunk(cid)
+            if remote is not None:
+                fmt = self.chunk_format(cid)
+                if fmt == CHUNK_FMT_PLAIN:
+                    remote = smart_decompress(remote)
+                return decode_chunk(remote, fmt)
+
         # Try disk first
         chunk_path = self._chunk_path(cid)
         if chunk_path.exists():
@@ -763,11 +811,11 @@ class StorageEngine:
         return None
 
     def get_chunk_raw(self, cid: str) -> Optional[bytes]:
-        """Return the bytes exactly as stored (XOR 0x75 applied when format=1).
-
-        This is what the CDN edge serves: the live slices endpoint returned the
-        obfuscated bytes, not the plaintext (verified against the Etag).
-        """
+        """Return the bytes exactly as stored (XOR 0x75 applied when format=1)."""
+        if getattr(self.tiered, "primary_storage_enabled", False):
+            remote = self.tiered.get_primary_chunk(cid)
+            if remote is not None:
+                return remote
         chunk_path = self._chunk_path(cid)
         if chunk_path.exists():
             if hasattr(self, "tiered"):
@@ -809,8 +857,15 @@ class StorageEngine:
         if data is None:
             return False
         path = self._chunk_path(cid)
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_bytes(encode_chunk(data, fmt))
+        encoded = encode_chunk(data, fmt)
+        if getattr(self.tiered, "primary_storage_enabled", False):
+            if not self.tiered.store_primary_chunk(cid, encoded, raw_size=len(data), compressed=False):
+                return False
+            if path.exists():
+                path.unlink()
+        else:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(encoded)
         conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("UPDATE chunks SET format = ? WHERE cid = ?", (int(fmt), cid))
