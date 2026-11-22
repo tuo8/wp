@@ -37,6 +37,9 @@ jobs:
       - name: Security regression tests
         working-directory: mydrive
         run: python -m unittest -v security_regression_test
+      - name: ImgBed storage adapter tests
+        working-directory: mydrive
+        run: python -m unittest -v imgbed_backend_test
       - name: PostgreSQL integration smoke tests
         working-directory: mydrive
         env:

@@ -692,6 +692,8 @@ class StorageEngine:
         if chunk_path.exists():
             if hasattr(self, "tiered"):
                 self.tiered.touch(cid)
+                if not self.tiered.ensure_primary_chunk(cid):
+                    raise RuntimeError(f"Primary ImgBed persistence retry failed for chunk {cid}")
             return  # Already stored — this IS the dedup!
         chunk_path.parent.mkdir(parents=True, exist_ok=True)
         encoded = encode_chunk(data, fmt)

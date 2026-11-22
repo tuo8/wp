@@ -329,6 +329,7 @@ class TieredStorageManager:
             "local_cache_max_bytes": int(os.environ.get("LOCAL_CACHE_MAX_BYTES", "0")),  # 0 = unlimited
             "compression_enabled": os.environ.get("CHUNK_COMPRESSION", "0").lower() in ("1", "true", "yes"),
             "auto_offload": os.environ.get("AUTO_OFFLOAD_COLD", "1").lower() in ("1", "true", "yes"),
+            "primary_storage": os.environ.get("IMGBED_PRIMARY_STORAGE", "0").lower() in ("1", "true", "yes"),
             "trash_retention_days": int(os.environ.get("TRASH_RETENTION_DAYS", "30")),
         }
 
@@ -349,7 +350,7 @@ class TieredStorageManager:
                 if k in allowed:
                     if k in ("local_cache_max_bytes", "trash_retention_days"):
                         v = max(0, int(v))
-                    elif k in ("compression_enabled", "auto_offload"):
+                    elif k in ("compression_enabled", "auto_offload", "primary_storage"):
                         v = bool(v)
                     self.config[k] = v
             self.cfg_path.write_text(json.dumps(self.config, indent=2, ensure_ascii=False), encoding="utf-8")
@@ -363,6 +364,8 @@ class TieredStorageManager:
             c["s3_secret_key"] = "***"
         else:
             c["s3_secret_key_set"] = False
+        c["imgbed_auth_code_set"] = bool(os.environ.get("IMGBED_AUTH_CODE", ""))
+        c["imgbed_admin_credentials_set"] = bool(os.environ.get("IMGBED_ADMIN_USERNAME", "") and os.environ.get("IMGBED_ADMIN_PASSWORD", ""))
         c["cold_active"] = self.backend is not None
         return c
 
@@ -379,8 +382,14 @@ class TieredStorageManager:
                 region=self.config.get("s3_region", "auto"),
                 prefix=self.config.get("s3_prefix", "mydrive-chunks"),
             )
+        elif kind == "imgbed":
+            from imgbed_backend import ImgBedBackend
+            self.backend = ImgBedBackend.from_env()
         else:
             self.backend = None
+
+        if self.config.get("primary_storage") and self.backend is None:
+            raise RuntimeError("IMGBED_PRIMARY_STORAGE is enabled but the configured cold backend is unavailable")
 
     def _init_db(self):
         conn = connect_db(self.db_path)
@@ -400,6 +409,8 @@ class TieredStorageManager:
         tier_cols = {row[1] for row in c.execute("PRAGMA table_info(chunk_tiers)")}
         if "stored_sha256" not in tier_cols:
             c.execute("ALTER TABLE chunk_tiers ADD COLUMN stored_sha256 TEXT DEFAULT ''")
+        if "cold_backend" not in tier_cols:
+            c.execute("ALTER TABLE chunk_tiers ADD COLUMN cold_backend TEXT DEFAULT ''")
         conn.commit()
         conn.close()
 
@@ -416,6 +427,7 @@ class TieredStorageManager:
     def record_chunk_stored(self, cid: str, raw_size: int, stored_size: int, compressed: bool,
                             stored_sha256: str = ""):
         now = int(time.time())
+        backend_kind = self.backend.kind if self.backend else ""
         conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute(
@@ -427,17 +439,31 @@ class TieredStorageManager:
                 stored_size=excluded.stored_size,
                 compressed=excluded.compressed,
                 in_local=1,
+                in_cold=CASE WHEN chunk_tiers.cold_backend = ? THEN chunk_tiers.in_cold ELSE 0 END,
+                cold_backend=CASE WHEN chunk_tiers.cold_backend = ? THEN chunk_tiers.cold_backend ELSE '' END,
                 last_access_ts=excluded.last_access_ts,
                 stored_sha256=excluded.stored_sha256
             """,
-            (cid, raw_size, stored_size, 1 if compressed else 0, now, stored_sha256),
+            (cid, raw_size, stored_size, 1 if compressed else 0, now, stored_sha256, backend_kind, backend_kind),
         )
         conn.commit()
         conn.close()
 
-        # If cold backend is configured and local cache cap is exceeded, offload LRU chunks
-        if self.backend and self.config.get("auto_offload", True) and self.config.get("local_cache_max_bytes", 0) > 0:
+        if self.backend and self.config.get("primary_storage") and self.backend.kind == "imgbed" and raw_size > 0:
+            if not self.offload_chunk(cid, evict_local=False):
+                raise RuntimeError(f"Primary storage upload/verification failed for chunk {cid}")
+            if self.config.get("local_cache_max_bytes", 0) > 0:
+                self.enforce_local_cache_limit()
+        elif self.backend and self.config.get("auto_offload", True) and self.config.get("local_cache_max_bytes", 0) > 0:
             self.enforce_local_cache_limit()
+
+    def ensure_primary_chunk(self, cid: str) -> bool:
+        """Retry/verify ImgBed persistence when a local chunk already exists."""
+        if not (self.backend and self.backend.kind == "imgbed" and self.config.get("primary_storage")):
+            return True
+        if not self._local_path(cid).exists():
+            return False
+        return self.offload_chunk(cid, evict_local=False)
 
     def touch(self, cid: str):
         now = int(time.time())
@@ -457,12 +483,19 @@ class TieredStorageManager:
                 return None
             conn = connect_db(self.db_path)
             c = conn.cursor()
-            c.execute("SELECT stored_size, stored_sha256 FROM chunk_tiers WHERE cid = ?", (cid,))
+            c.execute("SELECT stored_size, stored_sha256, cold_backend, in_cold FROM chunk_tiers WHERE cid = ?", (cid,))
             row = c.fetchone()
             conn.close()
             if row:
                 expected_size = int(row[0] or 0)
                 expected_hash = str(row[1] or "")
+                recorded_backend = str(row[2] or "")
+                if not int(row[3] or 0):
+                    return None
+                if recorded_backend and recorded_backend != self.backend.kind:
+                    return None
+                if not recorded_backend and self.backend.kind == "imgbed":
+                    return None
                 if expected_size and len(raw) != expected_size:
                     return None
                 if expected_hash and not hmac.compare_digest(
@@ -504,25 +537,39 @@ class TieredStorageManager:
             data = local.read_bytes()
             checksum = hashlib.sha256(data).hexdigest()
             key = self._cold_key(cid)
-            if not self.backend.put_chunk(key, data):
-                return False
-            remote = self.backend.get_chunk(key)
-            if remote is None or len(remote) != len(data) or not hmac.compare_digest(
-                hashlib.sha256(remote).hexdigest(), checksum
-            ):
-                return False
+            conn = connect_db(self.db_path)
+            c = conn.cursor()
+            c.execute("SELECT in_cold, cold_backend, stored_sha256 FROM chunk_tiers WHERE cid = ?", (cid,))
+            existing = c.fetchone()
+            conn.close()
+            remote_verified = False
+            if existing and int(existing[0] or 0) and str(existing[1] or "") == self.backend.kind:
+                if str(existing[2] or "") == checksum:
+                    remote = self.backend.get_chunk(key)
+                    remote_verified = remote is not None and len(remote) == len(data) and hmac.compare_digest(
+                        hashlib.sha256(remote).hexdigest(), checksum
+                    )
+            if not remote_verified:
+                if not self.backend.put_chunk(key, data):
+                    return False
+                remote = self.backend.get_chunk(key)
+                if remote is None or len(remote) != len(data) or not hmac.compare_digest(
+                    hashlib.sha256(remote).hexdigest(), checksum
+                ):
+                    return False
 
             now = int(time.time())
             conn = connect_db(self.db_path)
             c = conn.cursor()
             c.execute(
                 """INSERT INTO chunk_tiers
-                   (cid, raw_size, stored_size, compressed, in_local, in_cold, last_access_ts, stored_sha256)
-                   VALUES (?, ?, ?, 0, 1, 1, ?, ?)
+                   (cid, raw_size, stored_size, compressed, in_local, in_cold, last_access_ts, stored_sha256, cold_backend)
+                   VALUES (?, ?, ?, 0, 1, 1, ?, ?, ?)
                    ON CONFLICT(cid) DO UPDATE SET
                        in_cold=1, in_local=1, stored_size=excluded.stored_size,
-                       last_access_ts=excluded.last_access_ts, stored_sha256=excluded.stored_sha256""",
-                (cid, len(data), len(data), now, checksum),
+                       last_access_ts=excluded.last_access_ts, stored_sha256=excluded.stored_sha256,
+                       cold_backend=excluded.cold_backend""",
+                (cid, len(data), len(data), now, checksum, self.backend.kind),
             )
             conn.commit()
             conn.close()
@@ -614,9 +661,18 @@ class TieredStorageManager:
                     return 0
             if self.backend:
                 try:
-                    self.backend.delete_chunk(self._cold_key(cid))
+                    conn = connect_db(self.db_path)
+                    c = conn.cursor()
+                    c.execute("SELECT cold_backend, in_cold FROM chunk_tiers WHERE cid = ?", (cid,))
+                    tier = c.fetchone()
+                    conn.close()
+                    if tier and int(tier[1] or 0):
+                        recorded_backend = str(tier[0] or "")
+                        if recorded_backend and recorded_backend != self.backend.kind:
+                            return freed
+                        if not self.backend.delete_chunk(self._cold_key(cid)):
+                            return freed
                 except Exception:
-                    # Keep tier metadata so a failed remote delete can be retried.
                     return freed
             conn = connect_db(self.db_path)
             c = conn.cursor()
@@ -661,6 +717,7 @@ class TieredStorageManager:
             "compression_saved_bytes": max(0, raw_sum - stored_sum),
             "cold_type": self.config.get("cold_type", "none"),
             "cold_active": self.backend is not None,
+            "primary_storage": bool(self.config.get("primary_storage", False) and self.backend is not None and self.backend.kind == "imgbed"),
             "compression_enabled": self.compression_enabled,
             "trash_retention_days": int(self.config.get("trash_retention_days", 30)),
         }
