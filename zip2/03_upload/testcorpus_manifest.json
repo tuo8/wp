@@ -1,0 +1,44 @@
+[
+  {
+    "file": "03_upload/testcorpus\\hca-kb1.bin",
+    "size_bytes": 1024,
+    "sha256": "10f04598be0ff4b34cbc3e92da79b121a774adbfb842b575f78b15360a873ce6",
+    "mime": "application/octet-stream"
+  },
+  {
+    "file": "03_upload/testcorpus\\hca-kb100.bin",
+    "size_bytes": 102400,
+    "sha256": "eccf552f66656dcbc4b8ffe1ad21f3b334af75eb74ca7060292e83e3f60084b3",
+    "mime": "application/octet-stream"
+  },
+  {
+    "file": "03_upload/testcorpus\\hca-mb1.bin",
+    "size_bytes": 1048576,
+    "sha256": "3582c300c7cd7a350b0b726ae18b3c9a64c972b307d48707409520243a1df5a7",
+    "mime": "application/octet-stream"
+  },
+  {
+    "file": "03_upload/testcorpus\\hca-mb4.bin",
+    "size_bytes": 4194304,
+    "sha256": "79f4cbbc67135eb4cd9f519ae6cf658cb4f34d8b845522c521e3aad9ce864052",
+    "mime": "application/octet-stream"
+  },
+  {
+    "file": "03_upload/testcorpus\\hca-mb10.bin",
+    "size_bytes": 10485760,
+    "sha256": "8d07592271b899683f3758c14459d361855fc430619c22147156ba8e30f8c99e",
+    "mime": "application/octet-stream"
+  },
+  {
+    "file": "03_upload/testcorpus\\hca-mb50.bin",
+    "size_bytes": 52428800,
+    "sha256": "efbbd8606ffc386371d4983ad02b0c557fd79933ddebda2087a88a169e6c41e2",
+    "mime": "application/octet-stream"
+  },
+  {
+    "file": "03_upload/testcorpus\\hca-mb100.bin",
+    "size_bytes": 104857600,
+    "sha256": "9c490c2186ad312e4c9745b380efe6543b589c755b959d7e68fd46e7c01ba967",
+    "mime": "application/octet-stream"
+  }
+]

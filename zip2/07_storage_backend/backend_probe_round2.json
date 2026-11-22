@@ -1,0 +1,263 @@
+{
+ "ts": "2026-11-23T02:17:40",
+ "probes": {
+  "slice_address_fields": {
+   "kb1_leaf": {
+    "grpc": null,
+    "ms": 1999,
+    "raw_fields": {
+     "1": {
+      "1": "bafkreiaq6bczrpqp6szuzpb6slnhtmjbu52k3p5yik2xl54lcu3avbz44y",
+      "2": "https://slices.qzy.xyz/ipfs/blocks/2/34/bafkreiaq6bczrpqp6szuzpb6slnhtmjbu52k3p5yik2xl54lcu3avbz44y?auth_key=[REDACTED]&session=[REDACTED]",
+      "4": 52
+     },
+     "2": 1795414663100,
+     "3": "127.0.0.1",
+     "4": 1
+    },
+    "addresses_count": 1
+   },
+   "mb10_root": {
+    "grpc": null,
+    "ms": 1023,
+    "raw_fields": {
+     "1": {
+      "1": "bafybeiesgdftdz5o2sauh7ohyszoiqqwqcskkxjeleoc75nbctxboxpck4",
+      "2": "https://slices.qzy.xyz/ipfs/blocks/2/63/bafybeiesgdftdz5o2sauh7ohyszoiqqwqcskkxjeleoc75nbctxboxpck4?auth_key=[REDACTED]&session=[REDACTED]",
+      "4": 99
+     },
+     "2": 1795414664141,
+     "3": "127.0.0.1",
+     "4": 1
+    },
+    "addresses_count": 1
+   },
+   "gb_root": {
+    "grpc": null,
+    "ms": 983,
+    "raw_fields": {
+     "1": {
+      "1": "bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+      "2": "https://slices.qzy.xyz/ipfs/blocks/2/68/bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4?auth_key=[REDACTED]&session=[REDACTED]",
+      "4": 104
+     },
+     "2": 1795414665134,
+     "3": "127.0.0.1",
+     "4": 1
+    },
+    "addresses_count": 1
+   },
+   "gb_leaf": {
+    "grpc": null,
+    "ms": 897,
+    "raw_fields": {
+     "1": {
+      "1": "bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba",
+      "2": "https://slices.qzy.xyz/ipfs/blocks/2/35/bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba?auth_key=[REDACTED]&session=[REDACTED]",
+      "4": 53
+     },
+     "2": 1795414666044,
+     "3": "127.0.0.1",
+     "4": 1
+    },
+    "addresses_count": 1
+   }
+  },
+  "batch_addresses": {
+   "requested": 8,
+   "returned": 1,
+   "sample": {
+    "1": "bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+    "2": "https://slices.qzy.xyz/ipfs/blocks/2/68/bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4?auth_key=[REDACTED]&session=[REDACTED]",
+    "4": 104
+   }
+  },
+  "slice_normal": {
+   "tag": "normal",
+   "cid": "bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba",
+   "http": 200,
+   "bytes": 4194304,
+   "ms": 3159,
+   "headers": {
+    "server": "Byte-nginx",
+    "content-type": "application/octet-stream",
+    "content-length": "4194304",
+    "connection": "keep-alive",
+    "age": "0",
+    "etag": "\"bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba\"",
+    "via": "cache11.jhmp03,cache06.zjhuzhou-mp01,cache02.oversea-SG-SIN12,cache10.CN-HK-HKG8,cache02.oversea-JP-TYO10,cache04.oversea-US-SJC3,cache03.oversea-US-IAD1",
+    "x-bdcdn-cache-status": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "865301f71766c583e12da014cae9aff9",
+    "x-request-ip": "2a09:bac5:624f:372d::57f:82",
+    "x-response-cache": "miss",
+    "x-response-cinfo": "2a09:bac5:624f:372d::57f:82",
+    "x-tt-trace-tag": "id=5",
+    "date": "Sun, 22 Nov 2026 18:17:49 GMT",
+    "vary": "Origin"
+   },
+   "sha_ok": true,
+   "url_path": "/ipfs/blocks/2/35/bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba"
+  },
+  "slice_no_cache": {
+   "tag": "no_cache",
+   "cid": "bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba",
+   "http": 200,
+   "bytes": 4194304,
+   "ms": 3158,
+   "headers": {
+    "server": "Byte-nginx",
+    "content-type": "application/octet-stream",
+    "content-length": "4194304",
+    "connection": "keep-alive",
+    "age": "4",
+    "etag": "\"bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba\"",
+    "via": "cache64.tzmp,cache07.zjhuzhou-mp01,cache04.oversea-SG-SIN12,cache07.CN-HK-HKG8,cache04.oversea-US-IAD3,cache03.oversea-US-IAD1",
+    "x-bdcdn-cache-status": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "c4704ec2ddd571828f4c16cddcefd03a",
+    "x-request-ip": "2a09:bac5:624f:372d::57f:82",
+    "x-response-cache": "miss",
+    "x-response-cinfo": "2a09:bac5:624f:372d::57f:82",
+    "x-tt-trace-tag": "id=5",
+    "date": "Sun, 22 Nov 2026 18:17:53 GMT",
+    "vary": "Origin"
+   },
+   "sha_ok": true,
+   "url_path": "/ipfs/blocks/2/35/bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba"
+  },
+  "slice_no_store": {
+   "tag": "no_store",
+   "cid": "bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba",
+   "http": 200,
+   "bytes": 4194304,
+   "ms": 3098,
+   "headers": {
+    "server": "Byte-nginx",
+    "content-type": "application/octet-stream",
+    "content-length": "4194304",
+    "connection": "keep-alive",
+    "age": "2",
+    "etag": "\"bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba\"",
+    "via": "cache39.czmp,cache22.zjhuzhou-mp01,cache05.oversea-SG-SIN12,cache06.CN-HK-HKG8,cache05.oversea-US-IAD3,cache03.oversea-US-IAD1",
+    "x-bdcdn-cache-status": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "d1ec09a94275da7d43168ee250e66947",
+    "x-request-ip": "2a09:bac5:624f:372d::57f:82",
+    "x-response-cache": "miss",
+    "x-response-cinfo": "2a09:bac5:624f:372d::57f:82",
+    "x-tt-trace-tag": "id=5",
+    "date": "Sun, 22 Nov 2026 18:17:57 GMT",
+    "vary": "Origin"
+   },
+   "sha_ok": true,
+   "url_path": "/ipfs/blocks/2/35/bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba"
+  },
+  "slice_head": {
+   "http": 200,
+   "headers": {
+    "server": "Byte-nginx",
+    "content-type": "application/octet-stream",
+    "content-length": "4194304",
+    "connection": "keep-alive",
+    "age": "0",
+    "etag": "\"bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba\"",
+    "via": "cache18.sjzmp,cache20.heshijiazhuang-mp02,cache04.oversea-SG-SIN12,cache06.CN-HK-HKG8,cache01.oversea-JP-TYO10,cache06.oversea-US-SJC3,cache03.oversea-US-IAD1",
+    "x-bdcdn-cache-status": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "c98866a2776a97bb9b370fdf9979ac76",
+    "x-request-ip": "2a09:bac5:624f:372d::57f:82",
+    "x-response-cache": "miss",
+    "x-response-cinfo": "2a09:bac5:624f:372d::57f:82",
+    "x-tt-trace-tag": "id=5",
+    "date": "Sun, 22 Nov 2026 18:18:00 GMT",
+    "vary": "Origin"
+   }
+  },
+  "missing_block": {
+   "grpc": null,
+   "msg": null,
+   "addr_present": true,
+   "http": 400,
+   "bytes": 61,
+   "body_head": "invalid cid: trailing bytes in data buffer passed to cid Cast",
+   "headers": {
+    "server": "Byte-nginx",
+    "content-type": "text/plain; charset=utf-8",
+    "content-length": "61",
+    "connection": "keep-alive",
+    "date": "Sun, 22 Nov 2026 18:18:02 GMT",
+    "via": "cache07.tzmp,cache14.zjhuzhou-mp01,cache02.oversea-SG-SIN12,cache05.oversea-SG-SIN16,cache01.oversea-US-SJC3,cache03.oversea-US-IAD1",
+    "x-bdcdn-cache-status": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS",
+    "x-exception-info": "O4|400",
+    "x-request-id": "692c7b67405a2770c9d719e4dd699fc3",
+    "x-request-ip": "2a09:bac5:624f:372d::57f:82",
+    "x-response-cache": "miss",
+    "x-response-cinfo": "2a09:bac5:624f:372d::57f:82",
+    "x-tt-trace-tag": "id=5",
+    "vary": "Origin"
+   }
+  },
+  "gateway_head": {
+   "http": 200,
+   "headers": {
+    "server": "Byte-nginx",
+    "content-type": "application/octet-stream",
+    "content-length": "3381078505",
+    "connection": "keep-alive",
+    "accept-ranges": "bytes",
+    "age": "2875",
+    "etag": "\"bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4\"",
+    "last-modified": "Sun, 04 Jun 1989 15:04:05 GMT",
+    "qzy-tracking": "build-06202135",
+    "via": "cache05.oversea-US-IAD3,cache05.oversea-US-ATL2",
+    "x-bdcdn-cache-status": "TCP_MISS,TCP_HIT",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "6ba832297a6da68561ace5e2a22e81f5",
+    "x-request-ip": "2a09:bac5:624f:372d::57f:82",
+    "x-response-cache": "parent_hit",
+    "x-response-cinfo": "2a09:bac5:624f:372d::57f:82",
+    "x-tt-trace-tag": "id=5",
+    "date": "Sun, 22 Nov 2026 18:18:06 GMT",
+    "content-disposition": "attachment; filename=\"CAWD-987-AI.mp4\"; filename*=UTF-8''CAWD-987-AI.mp4"
+   }
+  },
+  "gateway_range_nocache": {
+   "http": 206,
+   "bytes": 1024,
+   "headers": {
+    "server": "Byte-nginx",
+    "content-type": "application/octet-stream",
+    "content-length": "1024",
+    "connection": "keep-alive",
+    "accept-ranges": "bytes",
+    "age": "2874",
+    "content-range": "bytes 0-1023/3381078505",
+    "etag": "\"bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4\"",
+    "last-modified": "Sun, 04 Jun 1989 15:04:05 GMT",
+    "qzy-tracking": "build-06202135",
+    "via": "cache02.oversea-US-IAD3,cache05.oversea-US-ATL2",
+    "x-bdcdn-cache-status": "TCP_MISS,TCP_HIT",
+    "x-content-type-options": "nosniff",
+    "x-request-id": "9379f3dba5b1eb7c7bee67a9889019f8",
+    "x-request-ip": "2a09:bac5:624f:372d::57f:82",
+    "x-response-cache": "parent_hit",
+    "x-response-cinfo": "2a09:bac5:624f:372d::57f:82",
+    "x-tt-trace-tag": "id=5",
+    "date": "Sun, 22 Nov 2026 18:18:06 GMT",
+    "content-disposition": "attachment; filename=\"CAWD-987-AI.mp4\"; filename*=UTF-8''CAWD-987-AI.mp4"
+   }
+  },
+  "deleted_object_reread": {
+   "grpc": null,
+   "msg": null,
+   "has_url": true,
+   "http": 200,
+   "raw_bytes": 165,
+   "dec_bytes": 165,
+   "via": "cache93.tzmp,cache28.zjhuzhou-mp01,cache06.oversea-SG-SIN12,cache06.CN-HK-HKG8,cache03.oversea-US-IAD3,cache03.oversea-US-IAD1",
+   "age": "0",
+   "server": "Byte-nginx"
+  }
+ }
+}

@@ -1,0 +1,133 @@
+{
+  "target": {
+    "name": "CAWD-987-AI.mp4",
+    "identity": "59227eb8d779e2abfa7d66f901124a77",
+    "cid": "bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+    "size": 3381078505
+  },
+  "ts": "2026-11-23T01:30:11",
+  "gateway_url_shape": "https://ipfs-gateway.qzy.xyz/file/bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4/f42c4f7a52454c3ea5fe8bf60b94fb44/CAWD-987-AI.mp4",
+  "gateway_head": {
+    "http": 200,
+    "len": "3381078505",
+    "etag": "\"bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4\"",
+    "server": "Byte-nginx",
+    "via": "cache73.tzmp,cache08.hetangshan-cu78",
+    "accept_ranges": "bytes"
+  },
+  "gateway_range_0_1023": {
+    "http": 206,
+    "bytes": 1024,
+    "content_range": "bytes 0-1023/3381078505",
+    "etag": "\"bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4\"",
+    "via": "cache61.tzmp,cache08.hetangshan-cu78",
+    "sha256_prefix_block": "d102b5b9666f31b07956a7defff9e9dd232801f0d7ba07600b918f1d02b45962"
+  },
+  "gateway_range_tail": {
+    "http": 206,
+    "bytes": 1000,
+    "content_range": "bytes 3381077505-3381078504/3381078505"
+  },
+  "slice_root_addr": {
+    "url": "https://slices.qzy.xyz/ipfs/blocks/2/68/bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+    "encrypt": 104,
+    "cid": "bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+    "ms": 129
+  },
+  "root_block": {
+    "http": 200,
+    "raw": 41973,
+    "dec": 41973,
+    "encrypt": 104,
+    "etag": "\"bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4\"",
+    "via": "cache40.czmp,pic01.hhhtcu",
+    "sha256": "8141b5c8507b14f7743d1e04538c33e8dc171125890a27eb376c036ec29e273f",
+    "ms": 270
+  },
+  "root_node": {
+    "unixfs_type": 2,
+    "filesize_field": 3381078505,
+    "declared_size": 3381078505,
+    "blocksizes_count": 807,
+    "blocksizes_sum": 3381078505,
+    "links": 807,
+    "node_bytes": 41973,
+    "cid_recompute": "bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+    "cid_match": true
+  },
+  "level1_children": [
+    {
+      "cid": "bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba",
+      "tsize": 4194304,
+      "dec_bytes": 4194304,
+      "unixfs_filesize": null,
+      "sublinks": 0,
+      "sha_ok": true,
+      "cid_recompute_match": true
+    },
+    {
+      "cid": "bafkreibnqjp5ysbtv7kwdwcbovw5d4qaddhsuyk7emaeyn5rv2fw3jqyze",
+      "tsize": 4194304,
+      "dec_bytes": 4194304,
+      "unixfs_filesize": null,
+      "sublinks": 0,
+      "sha_ok": true,
+      "cid_recompute_match": true
+    },
+    {
+      "cid": "bafkreigbei5g6wlap3bd5thpd7yelsaejlb72vawhkrl2aaseb6zeospxa",
+      "tsize": 4194304,
+      "dec_bytes": 4194304,
+      "unixfs_filesize": null,
+      "sublinks": 0,
+      "sha_ok": true,
+      "cid_recompute_match": true
+    },
+    {
+      "cid": "bafkreighlarsllfcbfqgfwrte4mcjqdnzpxgom3smxszblmvrzkg4bonvy",
+      "tsize": 4194304,
+      "dec_bytes": 4194304,
+      "unixfs_filesize": null,
+      "sublinks": 0,
+      "sha_ok": true,
+      "cid_recompute_match": true
+    },
+    {
+      "cid": "bafkreieb24mrgaxpcnkosws3w3qxiizi6o7g55rjtmroa6ibyuqkrbwcvy",
+      "tsize": 4194304,
+      "dec_bytes": 4194304,
+      "unixfs_filesize": null,
+      "sublinks": 0,
+      "sha_ok": true,
+      "cid_recompute_match": true
+    },
+    {
+      "cid": "bafkreifihp7x4nkjz7rarhum2h6yiwzvfihpgndrzrlw6d72rn7qdetzhy",
+      "tsize": 4194304,
+      "dec_bytes": 4194304,
+      "unixfs_filesize": null,
+      "sublinks": 0,
+      "sha_ok": true,
+      "cid_recompute_match": true
+    },
+    {
+      "cid": "bafkreidniev6qz2trwv2ddpg7a7e2dvwo6elgwlsaf6sday5dtpyt6rmve",
+      "tsize": 4194304,
+      "dec_bytes": 4194304,
+      "unixfs_filesize": null,
+      "sublinks": 0,
+      "sha_ok": true,
+      "cid_recompute_match": true
+    },
+    {
+      "cid": "bafkreibupmgef4ta6gfowtyywzw3oiyahavo7jpas7qp2fnoxoag772gha",
+      "tsize": 4194304,
+      "dec_bytes": 4194304,
+      "unixfs_filesize": null,
+      "sublinks": 0,
+      "sha_ok": true,
+      "cid_recompute_match": true
+    }
+  ],
+  "structure": "one_level_dag_leaves_at_root"
+}

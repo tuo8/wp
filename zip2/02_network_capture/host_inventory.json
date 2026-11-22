@@ -1,0 +1,140 @@
+[
+  {
+    "host": "drcdn2.2dland.cn",
+    "ip": [
+      "119.188.175.5",
+      "221.204.163.72"
+    ],
+    "tls": "TLSv1.3",
+    "issuer": {
+      "countryName": "CN",
+      "organizationName": "TrustAsia Technologies, Inc.",
+      "commonName": "TrustAsia DV TLS RSA CA 2025"
+    },
+    "not_after": "Feb 18 23:59:59 2027 GMT",
+    "san": [
+      "drcdn2.2dland.cn"
+    ]
+  },
+  {
+    "host": "ucenter.2dland.cn",
+    "ip": [
+      "116.136.159.41"
+    ],
+    "tls": "TLSv1.3",
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Let's Encrypt",
+      "commonName": "YE1"
+    },
+    "not_after": "Nov 24 04:17:49 2026 GMT",
+    "san": [
+      "*.2dland.cn",
+      "2dland.cn"
+    ]
+  },
+  {
+    "host": "simple-file-proxy.2dland.cn",
+    "ip": [
+      "101.26.38.162",
+      "101.72.219.132",
+      "101.72.219.135",
+      "101.72.219.146",
+      "101.72.219.149",
+      "101.72.219.152",
+      "101.72.219.157",
+      "101.72.219.163",
+      "101.72.219.166",
+      "101.72.219.174"
+    ],
+    "tls": "TLSv1.3",
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Let's Encrypt",
+      "commonName": "YE1"
+    },
+    "not_after": "Nov 24 04:17:49 2026 GMT",
+    "san": [
+      "*.2dland.cn",
+      "2dland.cn"
+    ]
+  },
+  {
+    "host": "slices.qzy.xyz",
+    "ip": [
+      "116.136.20.227",
+      "116.136.20.228"
+    ],
+    "tls": "TLSv1.3",
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Let's Encrypt",
+      "commonName": "YE1"
+    },
+    "not_after": "Dec  7 04:21:27 2026 GMT",
+    "san": [
+      "*.qzy.xyz",
+      "qzy.xyz"
+    ]
+  },
+  {
+    "host": "ipfs-gateway.qzy.xyz",
+    "ip": [
+      "101.26.38.162",
+      "101.72.219.132",
+      "101.72.219.135",
+      "101.72.219.146",
+      "101.72.219.149",
+      "101.72.219.152",
+      "101.72.219.157",
+      "101.72.219.163",
+      "101.75.249.63",
+      "101.75.249.64"
+    ],
+    "tls": "TLSv1.3",
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Let's Encrypt",
+      "commonName": "YE1"
+    },
+    "not_after": "Dec  7 04:21:27 2026 GMT",
+    "san": [
+      "*.qzy.xyz",
+      "qzy.xyz"
+    ]
+  },
+  {
+    "host": "drive.2dland.cn",
+    "ip": [
+      "116.136.159.41"
+    ],
+    "tls": "TLSv1.3",
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Let's Encrypt",
+      "commonName": "YE1"
+    },
+    "not_after": "Nov 24 04:17:49 2026 GMT",
+    "san": [
+      "*.2dland.cn",
+      "2dland.cn"
+    ]
+  },
+  {
+    "host": "2dland.cn",
+    "ip": [
+      "117.21.184.135"
+    ],
+    "tls": "TLSv1.3",
+    "issuer": {
+      "countryName": "US",
+      "organizationName": "Let's Encrypt",
+      "commonName": "YE1"
+    },
+    "not_after": "Nov 24 04:17:49 2026 GMT",
+    "san": [
+      "*.2dland.cn",
+      "2dland.cn"
+    ]
+  }
+]

@@ -1,0 +1,25 @@
+{
+  "file": "hca-up-mb50.bin",
+  "size": 52428800,
+  "sha256": "efbbd8606ffc386371d4983ad02b0c557fd79933ddebda2087a88a169e6c41e2",
+  "block_size": 4194304,
+  "n_blocks": 13,
+  "block_cids": [
+    "bafkreiaz7rnqlt2y4v7ecicwykr7alukpbu34a6ak3gxbbny5ptblmwu7u",
+    "bafkreibqv66hurtzwtb342swfmfl5x2eec32sa6kfca67vanhvn5akk4vm",
+    "bafkreig73ttvtjasbl7ytafbzpg7xzbbnwsc6ykomogja322cn6ywc5yai",
+    "bafkreigix6kdmyejt23ldksfhj7lrxmrssuhwfuhlzfy2d7jze4hcntrfa",
+    "bafkreibuorw4wfinfkixppha3qffo46senhtx5jku6lb4tywyeqwe2ndmu",
+    "bafkreifp4mouuwz3g5yhnmnpz4erk5w5lpehkskxd6pgvzxmit4tl43l2e",
+    "bafkreihdz4p52d3t4vpi4anxunntfram36rdaxg73vqej4l5myinag2coe",
+    "bafkreih4azwtnpltes65yfvnq6tdnanj4w3rhtkir5zstqcmyzauyjoysq",
+    "bafkreiei4lm7b6smyefao7oeinbps4fzeqgqqvnlr2hx5a6clgujfc3unq",
+    "bafkreifpqz5kew6tjd5sudcv4jmwsonflek7ynmxje5oikwdryu6i52xhm",
+    "bafkreihrnpnreetjs7ditmjhmcpupbsaumdj4aceqfmvjs6o7ym72enauy",
+    "bafkreiagbhyn6hzfh4lsdogtccsemzle5spz2i4uklyarvnakhol6ebb7u",
+    "bafkreigaemy2muqnh4324jdtyn4g5chjp75yky5skztrinpcxdla6m7ijq"
+  ],
+  "content_identity": "bafybeiejwiekxfr6fymxy7tpnh7sjdcoityrvvigopmtf3squ3kd3vgrzu",
+  "upload_seconds": 5.09,
+  "commit_http": 200
+}

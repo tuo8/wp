@@ -1,0 +1,170 @@
+{
+ "ts": "2026-11-23T02:22:09",
+ "calls": {
+  "slice_addr_gb_root": {
+   "svc": "v6.services.pub.PubUserFile",
+   "method": "GetSliceDownloadAddress",
+   "note": "count=1",
+   "http": 200,
+   "grpc": null,
+   "msg": null,
+   "frames": 2,
+   "resp": {
+    "1": {
+     "1": "bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+     "2": "https://slices.qzy.xyz/ipfs/blocks/2/68/bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4?auth_key=[REDACTED]&session=[REDACTED]",
+     "4": 104
+    },
+    "2": 1795414932493,
+    "3": "127.0.0.1",
+    "4": 1
+   }
+  },
+  "slice_addr_leaf": {
+   "svc": "v6.services.pub.PubUserFile",
+   "method": "GetSliceDownloadAddress",
+   "note": "count=1",
+   "http": 200,
+   "grpc": null,
+   "msg": null,
+   "frames": 2,
+   "resp": {
+    "1": {
+     "1": "bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba",
+     "2": "https://slices.qzy.xyz/ipfs/blocks/2/35/bafkreibixcbkqexjahswi2lsfv2cgmd5ueyf2j2u3z3n3i7eiofdssr5ba?auth_key=[REDACTED]&session=[REDACTED]",
+     "4": 53
+    },
+    "2": 1795414933473,
+    "3": "127.0.0.1",
+    "4": 1
+   }
+  },
+  "slice_addr_batch4": {
+   "svc": "v6.services.pub.PubUserFile",
+   "method": "GetSliceDownloadAddress",
+   "note": "count=4",
+   "http": 200,
+   "grpc": null,
+   "msg": null,
+   "frames": 2,
+   "resp": {
+    "1": {
+     "1": "bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+     "2": "https://slices.qzy.xyz/ipfs/blocks/2/68/bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4?auth_key=[REDACTED]&session=[REDACTED]",
+     "4": 104
+    },
+    "2": 1795414934408,
+    "3": "127.0.0.1",
+    "4": 1
+   }
+  },
+  "direct_addr_gb": {
+   "svc": "v6.services.pub.PubUserFile",
+   "method": "GetDirectDownloadAddress",
+   "note": "identity=根CID",
+   "http": 200,
+   "grpc": "5",
+   "msg": "file not found",
+   "frames": 0,
+   "resp": null
+  },
+  "list_dir": {
+   "svc": "v6.services.pub.PubUserFile",
+   "method": "List",
+   "note": "目录列表",
+   "http": 200,
+   "grpc": null,
+   "msg": null,
+   "frames": 2,
+   "resp": {
+    "1": [
+     {
+      "1": "97e625a3d2f48719882040ebfbf93444",
+      "3": "b648aca0cc94070f0de2a016b4aded76",
+      "4": "hca-up-mb50.bin",
+      "5": "/hca-2026-11-23/hca-up-mb50.bin",
+      "6": "application/octet-stream",
+      "7": 52428800,
+      "8": 40,
+      "9": 1795368276575,
+      "10": 1795368276575,
+      "24": "bafybeiejwiekxfr6fymxy7tpnh7sjdcoityrvvigopmtf3squ3kd3vgrzu",
+      "31": "hcaupmb50 bin"
+     },
+     {
+      "1": "d30fd5333e01f1f59d771983a1c345ac",
+      "3": "b648aca0cc94070f0de2a016b4aded76",
+      "4": "hca-kb1-full.bin",
+      "5": "/hca-2026-11-23/hca-kb1-full.bin",
+      "6": "application/octet-stream",
+      "7": 1024,
+      "8": 40,
+      "9": 1795367846436,
+      "10": 1795367846436,
+      "24": "bafkreiaq6bczrpqp6szuzpb6slnhtmjbu52k3p5yik2xl54lcu3avbz44y",
+      "31": "hcakb1full bin"
+     },
+     {
+      "1": "59227eb8d779e2abfa7d66f901124a77",
+      "3": "b648aca0cc94070f0de2a016b4aded76",
+      "4": "CAWD-987-AI.mp4",
+      "5": "/hca-2026-11-23/CAWD-987-AI.mp4",
+      "6": "video/mp4",
+      "7": 3381078505,
+      "8": 40,
+      "9": 1781460931160,
+      "10": 1781460931160,
+      "24": "bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+      "31": "cawd987ai mp4"
+     }
+    ],
+    "2": {
+     "2": 50,
+     "3": [
+      {
+       "1": "type",
+       "2": 1
+      },
+      "\n\tcreate_ts"
+     ]
+    }
+   }
+  },
+  "info_GetFileInfo": {
+   "http": 200,
+   "grpc": "12",
+   "msg": "unknown method GetFileInfo for service v6.services.pub.PubUserFile",
+   "resp": null
+  },
+  "info_Get": {
+   "http": 200,
+   "grpc": null,
+   "msg": null,
+   "resp": {
+    "1": "97e625a3d2f48719882040ebfbf93444",
+    "3": "b648aca0cc94070f0de2a016b4aded76",
+    "4": "hca-up-mb50.bin",
+    "5": "/hca-2026-11-23/hca-up-mb50.bin",
+    "6": "application/octet-stream",
+    "7": 52428800,
+    "8": 40,
+    "9": 1795368276575,
+    "10": 1795368276575,
+    "24": "bafybeiejwiekxfr6fymxy7tpnh7sjdcoityrvvigopmtf3squ3kd3vgrzu",
+    "31": "hcaupmb50 bin"
+   }
+  },
+  "info_Stat": {
+   "http": 200,
+   "grpc": "12",
+   "msg": "unknown method Stat for service v6.services.pub.PubUserFile",
+   "resp": null
+  },
+  "info_GetFile": {
+   "http": 200,
+   "grpc": "12",
+   "msg": "unknown method GetFile for service v6.services.pub.PubUserFile",
+   "resp": null
+  }
+ }
+}

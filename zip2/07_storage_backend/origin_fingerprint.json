@@ -1,0 +1,191 @@
+{
+ "ts": "2026-11-23T02:15:29",
+ "egress": {
+  "country": "United States",
+  "isp": "Cloudflare, Inc.",
+  "as": "AS13335 Cloudflare, Inc.",
+  "query": "104.28.152.118"
+ },
+ "tests": {
+  "absent_raw_cid": {
+   "cid": "bafkreieon7gmwzeirdqfhv53baqyugvto64lzezn3hycemfwtjoye7h7zu",
+   "http": 404,
+   "bytes": 83,
+   "ms": 1717,
+   "sha_ok": null,
+   "error_body": "read [bafkreieon7gmwzeirdqfhv53baqyugvto64lzezn3hycemfwtjoye7h7zu] error: not found",
+   "headers": {
+    "server": "Byte-nginx",
+    "content-type": "text/plain; charset=utf-8",
+    "content-length": "83",
+    "connection": "keep-alive",
+    "date": "Sun, 22 Nov 2026 18:15:34 GMT",
+    "via": "cache44.czmp,cache21.zjhuzhou-mp01,cache02.oversea-SG-SIN12,cache17.CN-HK-HKG8,cache05.oversea-US-IAD3,cache03.oversea-US-DAL1",
+    "x-bdcdn-cache-status": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS",
+    "x-exception-info": "O4|404",
+    "x-request-id": "936c65f5fee28132a5175d067f0f5360",
+    "x-request-ip": "2a09:bac5:624f:281e::3ff:63",
+    "x-response-cache": "miss",
+    "x-response-cinfo": "2a09:bac5:624f:281e::3ff:63",
+    "x-tt-trace-tag": "id=5",
+    "vary": "Origin"
+   }
+  },
+  "absent_dagpb_cid": {
+   "cid": "bafybeihgjm3u2gn7uzdri5da6vshzb5whobqylnj6wdbhybnl7utk5fpsi",
+   "http": 404,
+   "bytes": 83,
+   "ms": 666,
+   "sha_ok": null,
+   "error_body": "read [bafybeihgjm3u2gn7uzdri5da6vshzb5whobqylnj6wdbhybnl7utk5fpsi] error: not found",
+   "headers": {
+    "server": "Byte-nginx",
+    "content-type": "text/plain; charset=utf-8",
+    "content-length": "83",
+    "connection": "keep-alive",
+    "date": "Sun, 22 Nov 2026 18:15:36 GMT",
+    "via": "cache29.yzmp,cache17.zjhuzhou-mp01,cache05.oversea-SG-SIN12,cache16.CN-HK-HKG8,cache05.oversea-JP-TYO10,cache03.oversea-US-SJC3,cache02.oversea-US-LAX2,cache03.oversea-US-DAL1",
+    "x-bdcdn-cache-status": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS",
+    "x-exception-info": "O8|404",
+    "x-request-id": "f5ac3c35ffefe8cbbcd1ee69af6ce9b5",
+    "x-request-ip": "2a09:bac5:624f:281e::3ff:63",
+    "x-response-cache": "miss",
+    "x-response-cinfo": "2a09:bac5:624f:281e::3ff:63",
+    "x-tt-trace-tag": "id=5",
+    "vary": "Origin"
+   }
+  },
+  "cache_layer_samples": [
+   {
+    "mode": "default",
+    "n": 0,
+    "http": 200,
+    "ms": 3842,
+    "via": "cache40.tzmp,cache31.zjhuzhou-mp01,cache05.oversea-SG-SIN12,cache11.oversea-SG-SIN16,cache06.oversea-US-IAD3,cache03.oversea-US-DAL1",
+    "age": "2",
+    "x_response_cache": "miss",
+    "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+   },
+   {
+    "mode": "default",
+    "n": 1,
+    "http": 200,
+    "ms": 3568,
+    "via": "cache71.tzmp,cache23.zjhuzhou-mp01,cache03.oversea-SG-SIN12,cache13.oversea-SG-SIN16,cache01.oversea-US-IAD3,cache03.oversea-US-DAL1",
+    "age": "2",
+    "x_response_cache": "miss",
+    "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+   },
+   {
+    "mode": "default",
+    "n": 2,
+    "http": 200,
+    "ms": 2631,
+    "via": "cache54.sxmp,cache14.zjhuzhou-mp01,cache04.oversea-SG-SIN12,cache20.CN-HK-HKG8,cache03.oversea-JP-TYO10,cache01.oversea-US-SJC3,cache03.oversea-US-LAX2,cache03.oversea-US-DAL1",
+    "age": "0",
+    "x_response_cache": "miss",
+    "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+   },
+   {
+    "mode": "default",
+    "n": 3,
+    "http": 200,
+    "ms": 2822,
+    "via": "cache67.tzmp,cache12.zjhuzhou-mp01,cache06.oversea-SG-SIN12,cache11.oversea-SG-SIN16,cache01.oversea-US-SJC3,cache03.oversea-US-LAX2,cache03.oversea-US-DAL1",
+    "age": "4",
+    "x_response_cache": "miss",
+    "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+   },
+   {
+    "mode": "default",
+    "n": 4,
+    "http": 200,
+    "ms": 3683,
+    "via": "cache16.tzmp,cache05.zjhuzhou-mp01,cache03.oversea-SG-SIN12,cache09.oversea-SG-SIN16,cache04.oversea-US-SJC3,cache02.oversea-US-LAX2,cache03.oversea-US-DAL1",
+    "age": "0",
+    "x_response_cache": "miss",
+    "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+   },
+   {
+    "mode": "default",
+    "n": 5,
+    "http": 200,
+    "ms": 3518,
+    "via": "cache68.sxmp,cache22.zjhuzhou-mp01,cache05.oversea-SG-SIN12,cache14.oversea-SG-SIN16,cache04.oversea-US-IAD3,cache03.oversea-US-DAL1",
+    "age": "0",
+    "x_response_cache": "miss",
+    "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+   },
+   {
+    "mode": "force_ipv4",
+    "n": 0,
+    "http": 200,
+    "ms": 5054,
+    "via": "cache32.sxmp,cache15.zjhuzhou-mp01,cache01.oversea-SG-SIN12,cache08.oversea-SG-SIN16,cache05.oversea-US-SJC3,cache01.oversea-US-IAD1",
+    "age": "1",
+    "x_response_cache": "miss",
+    "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+   },
+   {
+    "mode": "force_ipv4",
+    "n": 1,
+    "http": 200,
+    "ms": 3886,
+    "via": "cache24.sjzmp,cache23.heshijiazhuang-mp02,cache06.oversea-SG-SIN12,cache18.CN-HK-HKG8,cache04.oversea-JP-TYO10,cache01.oversea-US-SJC3,mixed02.oversea-US-IAD1",
+    "age": "1",
+    "x_response_cache": "miss",
+    "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+   },
+   {
+    "mode": "force_ipv4",
+    "n": 2,
+    "http": 200,
+    "ms": 5131,
+    "via": "cache18.sxmp,cache22.zjhuzhou-mp01,cache06.oversea-SG-SIN12,cache05.CN-HK-HKG8,cache02.oversea-US-IAD3,cache05.oversea-US-IAD1",
+    "age": "3",
+    "x_response_cache": "miss",
+    "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+   }
+  ],
+  "cache_key_probe": {
+   "added_param": "_cb=1",
+   "http": 200,
+   "ms": 4213,
+   "via": "cache54.sjzmp,cache17.heshijiazhuang-mp02,cache03.oversea-SG-SIN12,cache08.oversea-SG-SIN16,cache06.oversea-US-IAD3,cache03.oversea-US-DAL1",
+   "age": "4",
+   "x_response_cache": "miss",
+   "x_bdcdn": "TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS,TCP_MISS"
+  },
+  "deleted_leaf_reread": {
+   "http": 200,
+   "bytes": 4194304,
+   "ms": 3142,
+   "sha_ok": false,
+   "via": "cache02.sjzmp,cache21.heshijiazhuang-mp02,cache02.oversea-SG-SIN12,cache11.oversea-SG-SIN16,cache01.oversea-US-SJC3,cache04.oversea-US-LAX2,cache03.oversea-US-DAL1",
+   "age": "3",
+   "x_response_cache": "miss"
+  },
+  "gateway_absent_cid": {
+   "http": 403,
+   "bytes": 17,
+   "body_head": "check sign failed",
+   "headers": {
+    "server": "nginx",
+    "date": "Sun, 22 Nov 2026 18:16:45 GMT",
+    "content-type": "text/html",
+    "connection": "keep-alive",
+    "error-info": "check sign failed",
+    "byte-error-code": "00014",
+    "content-length": "17",
+    "via": "cache02.oversea-US-ATL2",
+    "x-request-ip": "2a09:bac5:624f:1173::1bd:de",
+    "x-tt-trace-tag": "id=5",
+    "x-request-id": "ead11bffbe453b60dce7d78c29704256",
+    "x-exception-info": "deny by url auth",
+    "x-response-cinfo": "2a09:bac5:624f:1173::1bd:de",
+    "x-response-cache": "miss",
+    "content-disposition": "attachment; filename=\"CAWD-987-AI.mp4\"; filename*=UTF-8''CAWD-987-AI.mp4"
+   }
+  }
+ }
+}

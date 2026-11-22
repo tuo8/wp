@@ -1,0 +1,42 @@
+{
+  "ts": "2026-11-23T01:32:14",
+  "ours_root": "bafybeiesgdftdz5o2sauh7ohyszoiqqwqcskkxjeleoc75nbctxboxpck4",
+  "ours_leaf": "bafkreiccgyrrt57i5i7igzdnhcwdqfpkqw4njn3mhxuvgv6xrn67ikopd4",
+  "ours_gb": "bafybeiebig24qud3ct3xipi6arjyym7i3qlrcjmjbit6wn3manxmfhrhh4",
+  "control": "bafybeigdyrzt5sfp7udm7hu76uh7y26nf3efuylqabf3oclgtqy55fbzdi",
+  "results": {
+    "dht_provider_ours": {
+      "http": 200,
+      "len": 16,
+      "providers_seen": 1,
+      "head": "<binary/ok>"
+    },
+    "dht_provider_ours_gb": {
+      "http": 200,
+      "len": 16,
+      "providers_seen": 1,
+      "head": "<binary/ok>"
+    },
+    "dht_provider_ours_leaf": {
+      "http": 200,
+      "len": 16,
+      "providers_seen": 1,
+      "head": "<binary/ok>"
+    },
+    "dht_provider_control": {
+      "http": 200,
+      "len": 30432,
+      "providers_seen": 1,
+      "head": "<binary/ok>"
+    },
+    "public_gw_ours": {
+      "error": "ConnectTimeout: HTTPSConnectionPool(host='ipfs.io', port=443): Max retries exceeded with url: /ipfs/bafybeiesgdftdz5"
+    },
+    "public_gw_control": {
+      "error": "ConnectTimeout: HTTPSConnectionPool(host='ipfs.io', port=443): Max retries exceeded with url: /ipfs/bafybeigdyrzt5sf"
+    },
+    "dweb_ours": {
+      "error": "ConnectTimeout: HTTPSConnectionPool(host='bafybeiesgdftdz5o2sauh7ohyszoiqqwqcskkxjeleoc75nbctxboxpck4.ipfs.dweb.link"
+    }
+  }
+}

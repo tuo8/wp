@@ -1,0 +1,3 @@
+{"host": "drcdn2.2dland.cn", "dns": ["119.188.175.5", "221.204.163.72"]}
+{"ip": "119.188.175.5", "tls": "TLSv1.3", "cipher": "TLS_AES_256_GCM_SHA384", "subject": {"commonName": "drcdn2.2dland.cn"}, "issuer": {"countryName": "CN", "organizationName": "TrustAsia Technologies, Inc.", "commonName": "TrustAsia DV TLS RSA CA 2025"}, "notAfter": "Feb 18 23:59:59 2027 GMT", "SAN": [["DNS", "drcdn2.2dland.cn"]]}
+{"ip": "221.204.163.72", "tls": "TLSv1.3", "cipher": "TLS_AES_256_GCM_SHA384", "subject": {"commonName": "drcdn2.2dland.cn"}, "issuer": {"countryName": "CN", "organizationName": "TrustAsia Technologies, Inc.", "commonName": "TrustAsia DV TLS RSA CA 2025"}, "notAfter": "Feb 18 23:59:59 2027 GMT", "SAN": [["DNS", "drcdn2.2dland.cn"]]}
