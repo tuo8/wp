@@ -51,7 +51,7 @@ class ImgBedPrimaryStorageTests(unittest.TestCase):
         import os
         from unittest.mock import patch
         with tempfile.TemporaryDirectory() as root:
-            p=Path(root); (p/"json").mkdir(parents=True)
+            p=Path(root); (p/"json").mkdir(parents=True); (p/"db").mkdir()
             (p/"json/tiered_storage.json").write_text(
                 '{"cold_type":"s3","s3_endpoint":"http://old-minio:9000","s3_bucket":"old","primary_storage":false}',
                 encoding="utf-8",
