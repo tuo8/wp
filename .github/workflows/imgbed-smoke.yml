@@ -10,27 +10,51 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     steps:
-      - name: Probe ImgBed endpoints without credentials
+      - name: Probe ImgBed endpoints and authenticated Telegram round-trip
         env:
           BASE_URL: ${{ inputs.base_url }}
+          IMGBED_AUTH_CODE: ${{ secrets.IMGBED_AUTH_CODE }}
         run: |
-          set +e
+          set -euo pipefail
           echo "Target: $BASE_URL"
-          for path in "/" "/file/invalid-smoke-test-id"; do
-            code=$(curl --connect-timeout 15 --max-time 30 -sS -o /tmp/body -w "%{http_code}" "$BASE_URL$path")
-            rc=$?
-            echo "GET $path curl_exit=$rc http=$code"
-            head -c 300 /tmp/body 2>/dev/null | tr '\n' ' '
-            echo
-          done
-          code=$(curl --connect-timeout 15 --max-time 30 -sS -X OPTIONS -o /tmp/body -w "%{http_code}" "$BASE_URL/upload")
-          rc=$?
-          echo "OPTIONS /upload curl_exit=$rc http=$code"
-          head -c 300 /tmp/body 2>/dev/null | tr '\n' ' '
+          code=$(curl --connect-timeout 15 --max-time 30 -sS -o /tmp/root -w "%{http_code}" "$BASE_URL/")
+          echo "GET / http=$code"
+          head -c 160 /tmp/root | tr '\n' ' '
           echo
-          printf 'imgbed-smoke-test-only\n' > /tmp/imgbed-smoke.txt
-          code=$(curl --connect-timeout 15 --max-time 30 -sS -X POST -F 'file=@/tmp/imgbed-smoke.txt' -o /tmp/body -w "%{http_code}" "$BASE_URL/upload")
-          rc=$?
-          echo "POST /upload (no auth; expected rejection) curl_exit=$rc http=$code"
-          head -c 300 /tmp/body 2>/dev/null | tr '\n' ' '
-          echo
+          code=$(curl --connect-timeout 15 --max-time 30 -sS -o /tmp/missing -w "%{http_code}" "$BASE_URL/file/invalid-smoke-test-id")
+          echo "GET /file/<invalid-id> http=$code"
+          code=$(curl --connect-timeout 15 --max-time 30 -sS -X OPTIONS -o /tmp/options -w "%{http_code}" "$BASE_URL/upload")
+          echo "OPTIONS /upload http=$code"
+          if [ -z "$IMGBED_AUTH_CODE" ]; then
+            echo "AUTHENTICATED_UPLOAD=SKIPPED (GitHub Actions secret IMGBED_AUTH_CODE is not configured)"
+            exit 0
+          fi
+          echo "AUTHENTICATED_UPLOAD=STARTING"
+          printf 'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/lXcAAAAASUVORK5CYII=' | base64 -d > /tmp/imgbed-smoke.png
+          sha256sum /tmp/imgbed-smoke.png
+          response=$(curl --connect-timeout 15 --max-time 60 -sS -X POST \
+            -H "authCode: $IMGBED_AUTH_CODE" \
+            -F 'uploadChannel=telegram' \
+            -F 'uploadNameType=origin' \
+            -F 'autoRetry=false' \
+            -F 'returnFormat=default' \
+            -F 'serverCompress=false' \
+            -F 'file=@/tmp/imgbed-smoke.png;filename=imgbed-smoke.png;type=application/octet-stream' \
+            "$BASE_URL/upload?uploadChannel=telegram&uploadNameType=origin&autoRetry=false&returnFormat=default&serverCompress=false")
+          printf '%s\n' "$response" | jq .
+          src=$(printf '%s' "$response" | jq -r 'if type=="array" then .[0].src // empty else (.data // .).src // empty end')
+          if [ -z "$src" ]; then
+            echo "UPLOAD_RESULT=FAILED (no src field in response)"
+            exit 1
+          fi
+          id=$(python3 -c 'import sys,urllib.parse; print(urllib.parse.urlparse(sys.argv[1]).path.rstrip("/").split("/")[-1])' "$src")
+          echo "UPLOAD_RESULT=OK id=$id"
+          code=$(curl --connect-timeout 15 --max-time 60 -sS -o /tmp/imgbed-downloaded -w "%{http_code}" "$BASE_URL/file/$id")
+          echo "DOWNLOAD_HTTP=$code"
+          if [ "$code" != "200" ]; then exit 1; fi
+          original=$(sha256sum /tmp/imgbed-smoke.png | cut -d' ' -f1)
+          downloaded=$(sha256sum /tmp/imgbed-downloaded | cut -d' ' -f1)
+          echo "ORIGINAL_SHA256=$original"
+          echo "DOWNLOADED_SHA256=$downloaded"
+          [ "$original" = "$downloaded" ]
+          echo "ROUND_TRIP=PASS"
