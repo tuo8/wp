@@ -62,11 +62,15 @@ share = ShareManager(engine)
 ARIA2_EXE = os.environ.get("ARIA2_EXE", str(
     Path(__file__).resolve().parent.parent / "tools" / "aria2"
     / "aria2-1.37.0-win-64bit-build1" / "aria2c.exe"))
+RUNTIME_MODE = os.environ.get("MYDRIVE_ENV", "development").strip().lower()
+ARIA2_SECRET = os.environ.get("ARIA2_SECRET", "mydrive").strip()
+if RUNTIME_MODE in ("prod", "production") and len(ARIA2_SECRET) < 32:
+    raise RuntimeError("Production requires ARIA2_SECRET with at least 32 characters")
 OFFLINE_ROOT = os.path.join(STORAGE_ROOT, "offline")
 aria2 = Aria2(
     ARIA2_EXE,
     port=int(os.environ.get("ARIA2_PORT", "6800")),
-    secret=os.environ.get("ARIA2_SECRET", "mydrive"),
+    secret=ARIA2_SECRET,
     download_root=os.path.join(OFFLINE_ROOT, "downloads"),
     meta_dir=os.path.join(OFFLINE_ROOT, "meta"),
     dht_port=int(os.environ.get("ARIA2_DHT_PORT", "6881")),
@@ -86,7 +90,10 @@ webdav = WebDAVGateway(
 )
 
 # Mount the v6 protocol compatibility layer (gRPC-Web + REST gateway)
-PRESIGN_SECRET = os.environ.get("MYDRIVE_PRESIGN_SECRET") or auth.secret_key
+PRESIGN_SECRET = os.environ.get("MYDRIVE_PRESIGN_SECRET", "").strip()
+if RUNTIME_MODE in ("prod", "production") and len(PRESIGN_SECRET) < 32:
+    raise RuntimeError("Production requires MYDRIVE_PRESIGN_SECRET with at least 32 characters")
+PRESIGN_SECRET = PRESIGN_SECRET or auth.secret_key
 # ---- 独立 SFTP 端口（对齐 sftp://<host>:2022） ----
 sftp_service = None
 if SftpService is not None and os.environ.get("SFTP_ENABLE", "1").lower() not in ("0", "false", "no"):

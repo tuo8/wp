@@ -36,8 +36,15 @@ class AuthManager:
         self.db_dir = self.root / "db"
         self.db_dir.mkdir(parents=True, exist_ok=True)
         self.db_path = self.db_dir / "auth.sqlite"
-        # Secret key for signing tokens — in production, load from env
-        self.secret_key = os.environ.get("MYDRIVE_SECRET", "mydrive_default_secret_change_me")
+        # Known development fallback is forbidden when the deployment declares production.
+        runtime_mode = os.environ.get("MYDRIVE_ENV", "development").strip().lower()
+        configured_secret = os.environ.get("MYDRIVE_SECRET", "").strip()
+        if runtime_mode in ("prod", "production"):
+            if len(configured_secret) < 32 or configured_secret == "mydrive_default_secret_change_me":
+                raise RuntimeError("Production requires MYDRIVE_SECRET with at least 32 characters")
+            self.secret_key = configured_secret
+        else:
+            self.secret_key = configured_secret or "mydrive_default_secret_change_me"
         self._init_db()
 
     def _init_db(self):
