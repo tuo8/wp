@@ -26,7 +26,7 @@ Storage layout on disk:
 import os
 import json
 import sqlite3
-from db_adapter import connect_db
+from db_adapter import connect_db, is_postgres_enabled
 import hashlib
 import time
 import uuid
@@ -348,10 +348,32 @@ class StorageEngine:
 
         # 秒传索引全局化：线上 FastLookup 是跨用户的（同内容一次入库，处处秒传）。
         # 旧库的唯一约束含 user_id，必须重建表才能去掉它。
-        ddl = c.execute(
-            "SELECT sql FROM sqlite_master WHERE type='table' AND name='fast_lookup'"
-        ).fetchone()
-        if ddl and "user_id)" in (ddl[0] or "").replace(" ", "").replace("\n", ""):
+        if is_postgres_enabled():
+            scoped_unique = c.execute(
+                """SELECT tc.constraint_name
+                   FROM information_schema.table_constraints tc
+                   JOIN information_schema.key_column_usage kcu
+                     ON tc.constraint_name = kcu.constraint_name
+                    AND tc.table_schema = kcu.table_schema
+                    AND tc.table_name = kcu.table_name
+                   WHERE tc.constraint_type = 'UNIQUE'
+                     AND tc.table_schema = current_schema()
+                     AND tc.table_name = 'fast_lookup'
+                   GROUP BY tc.constraint_name
+                   HAVING COUNT(*) = 3
+                      AND SUM(CASE WHEN kcu.column_name = 'sha1' THEN 1 ELSE 0 END) = 1
+                      AND SUM(CASE WHEN kcu.column_name = 'file_size' THEN 1 ELSE 0 END) = 1
+                      AND SUM(CASE WHEN kcu.column_name = 'user_id' THEN 1 ELSE 0 END) = 1"""
+            ).fetchone()
+            has_user_scoped_unique = scoped_unique is not None
+        else:
+            ddl = c.execute(
+                "SELECT sql FROM sqlite_master WHERE type='table' AND name='fast_lookup'"
+            ).fetchone()
+            has_user_scoped_unique = bool(
+                ddl and "user_id)" in (ddl[0] or "").replace(" ", "").replace("\n", "")
+            )
+        if has_user_scoped_unique:
             c.execute("ALTER TABLE fast_lookup RENAME TO fast_lookup_scoped")
             c.execute("""
                 CREATE TABLE fast_lookup (
