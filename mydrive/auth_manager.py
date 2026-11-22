@@ -382,9 +382,11 @@ class AuthManager:
     # ==================== ACCOUNT LIFECYCLE (v6 PubUser) ====================
 
     def change_password(self, user_id: str, old_password: str, new_password: str) -> dict:
-        """v6 ``PubUser.ChangePassword`` — verify old, set new, revoke sessions."""
-        if len(new_password or "") < 6:
-            return {"success": False, "error": "Password too short"}
+        """Change password only after verifying the current password; revoke sessions."""
+        if not old_password:
+            return {"success": False, "error": "Current password required"}
+        if len(new_password or "") < 10:
+            return {"success": False, "error": "Password must be at least 10 characters"}
         conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT username, password_hash, password_salt FROM users WHERE user_id = ?", (user_id,))
@@ -393,10 +395,9 @@ class AuthManager:
             conn.close()
             return {"success": False, "error": "User not found"}
         username, pw_hash, salt = row
-        if old_password and not self._verify_password(old_password, salt, pw_hash):
+        if not self._verify_password(old_password, salt, pw_hash):
             conn.close()
             return {"success": False, "error": "Wrong password"}
-
         new_salt = secrets.token_hex(16)
         new_hash = self._hash_password(new_password, new_salt)
         c.execute("UPDATE users SET password_hash = ?, password_salt = ? WHERE user_id = ?",
@@ -407,9 +408,11 @@ class AuthManager:
         return {"success": True, "user_id": user_id, "username": username}
 
     def reset_password(self, username: str, new_password: str, sms_code: str = "") -> dict:
-        """v6 ``PubUser.ResetPassword`` — password reset by identity (+ SMS code when bound)."""
-        if len(new_password or "") < 6:
-            return {"success": False, "error": "Password too short"}
+        """Reset password only with a one-time code sent to the account's recovery phone."""
+        if not sms_code:
+            return {"success": False, "error": "SMS verification code required"}
+        if len(new_password or "") < 10:
+            return {"success": False, "error": "Password must be at least 10 characters"}
         conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT user_id FROM users WHERE username = ?", (username,))
@@ -418,15 +421,24 @@ class AuthManager:
             conn.close()
             return {"success": False, "error": "User not found"}
         user_id = row[0]
-        if sms_code:
-            c.execute(
-                "SELECT code, expires_ts, used FROM sms_codes WHERE phone = ? ORDER BY created_ts DESC LIMIT 1",
-                (username,))
-            sms = c.fetchone()
-            if not sms or sms[2] or sms[0] != sms_code or int(time.time()) > sms[1]:
-                conn.close()
-                return {"success": False, "error": "invalid sms code"}
-            c.execute("UPDATE sms_codes SET used = 1 WHERE phone = ?", (username,))
+        c.execute("SELECT phone FROM user_profile WHERE user_id = ?", (user_id,))
+        profile = c.fetchone()
+        phone = (profile[0] if profile and profile[0] else "").strip()
+        normalized_username = username.replace("+", "") if username else ""
+        if not phone and normalized_username.isdigit() and 7 <= len(normalized_username) <= 20:
+            phone = username
+        if not phone:
+            conn.close()
+            return {"success": False, "error": "No recovery phone is configured for this account"}
+        c.execute(
+            "SELECT code, expires_ts, used FROM sms_codes WHERE phone = ? ORDER BY created_ts DESC LIMIT 1",
+            (phone,))
+        sms = c.fetchone()
+        if not sms or sms[2] or not hmac.compare_digest(str(sms[0]), str(sms_code).strip()) or int(time.time()) > sms[1]:
+            conn.close()
+            return {"success": False, "error": "Invalid or expired SMS code"}
+        c.execute("UPDATE sms_codes SET used = 1 WHERE phone = ? AND code = ? AND used = 0",
+                  (phone, sms[0]))
         new_salt = secrets.token_hex(16)
         new_hash = self._hash_password(new_password, new_salt)
         c.execute("UPDATE users SET password_hash = ?, password_salt = ? WHERE user_id = ?",
@@ -437,7 +449,9 @@ class AuthManager:
         return {"success": True, "user_id": user_id, "username": username}
 
     def delete_user(self, user_id: str, password: str = "") -> dict:
-        """v6 ``PubUser.Delete`` — drop the account and every session."""
+        """Delete an account only after password confirmation."""
+        if not password:
+            return {"success": False, "error": "Password required"}
         conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("SELECT username, password_hash, password_salt FROM users WHERE user_id = ?", (user_id,))
@@ -445,7 +459,7 @@ class AuthManager:
         if not row:
             conn.close()
             return {"success": False, "error": "User not found"}
-        if password and not self._verify_password(password, row[2], row[1]):
+        if not self._verify_password(password, row[2], row[1]):
             conn.close()
             return {"success": False, "error": "Wrong password"}
         c.execute("DELETE FROM users WHERE user_id = ?", (user_id,))
@@ -507,22 +521,28 @@ class AuthManager:
     # ==================== SMS VERIFY CODE ====================
 
     def send_sms_code(self, phone: str, scene: int = 0, ttl: int = 300) -> dict:
-        """v6 ``PubUser.SendSmsVerifyCode`` — issue a 6-digit code for a phone number."""
+        """Issue a verification code only in explicit development mode.
+
+        A real SMS provider must be integrated before production SMS flows are enabled.
+        Never return verification codes from a production API response.
+        """
         phone = (phone or "").strip()
         if not phone:
             return {"success": False, "error": "phone required"}
+        if os.environ.get("MYDRIVE_SMS_DEBUG", "0").strip().lower() not in ("1", "true", "yes"):
+            return {"success": False, "error": "SMS provider is not configured"}
         code = f"{secrets.randbelow(1000000):06d}"
         now = int(time.time())
+        expires = now + max(60, min(int(ttl), 600))
         conn = connect_db(self.db_path)
         c = conn.cursor()
         c.execute("DELETE FROM sms_codes WHERE phone = ? AND used = 1", (phone,))
         c.execute(
             "INSERT INTO sms_codes (phone, code, scene, created_ts, expires_ts, used) VALUES (?,?,?,?,?,0)",
-            (phone, code, scene, now, now + ttl))
+            (phone, code, scene, now, expires))
         conn.commit()
         conn.close()
-        # No real SMS gateway in the lab: surface the code so clients can complete the flow.
-        return {"success": True, "code": code, "expire_ts": now + ttl}
+        return {"success": True, "code": code, "expire_ts": expires}
 
     def verify_sms_code(self, phone: str, code: str) -> bool:
         conn = connect_db(self.db_path)

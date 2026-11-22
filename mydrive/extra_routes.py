@@ -169,31 +169,17 @@ def mount_extra_routes(
         if not uid:
             return False
         env_admins = [x.strip().lower() for x in os.environ.get("ADMIN_USERS", "").split(",") if x.strip()]
-        # Resolve username from auth DB
+        if not env_admins:
+            # Fail closed: never promote the first public registrant to administrator.
+            return False
         username = ""
         try:
-            u = auth.get_user(uid) if hasattr(auth, "get_user") else None
-            if isinstance(u, dict):
-                username = (u.get("username") or "").lower()
+            user = auth.get_user(uid) if hasattr(auth, "get_user") else None
+            if isinstance(user, dict):
+                username = (user.get("username") or "").lower()
         except Exception:
             pass
-        if env_admins:
-            return uid.lower() in env_admins or (username and username in env_admins)
-        # Default policy: 'admin' or the very first registered user is the system administrator
-        if username == "admin":
-            return True
-        try:
-            import sqlite3
-            dbp = getattr(auth, "db_path", None)
-            if dbp:
-                conn = sqlite3.connect(str(dbp))
-                row = conn.execute("SELECT user_id FROM users ORDER BY rowid ASC LIMIT 1").fetchone()
-                conn.close()
-                if row and str(row[0]) == str(uid):
-                    return True
-        except Exception:
-            pass
-        return False
+        return uid.lower() in env_admins or (bool(username) and username in env_admins)
 
     def _require_admin(request: Request):
         if not _is_admin_user(request):
@@ -221,11 +207,13 @@ def mount_extra_routes(
     # ==================== TIERED STORAGE & SPACE SAVING ====================
 
     @app.get("/api/storage/tiered/config")
+        _require_admin(request)
     async def get_tiered_config(request: Request):
         caller_id_fn(request)
         return engine.tiered.get_public_config()
 
     @app.post("/api/storage/tiered/config")
+        _require_admin(request)
     async def update_tiered_config(req: TieredConfigRequest, request: Request):
         caller_id_fn(request)
         updates = {k: v for k, v in (req.model_dump() if hasattr(req, 'model_dump') else req.dict()).items() if v is not None}
@@ -235,6 +223,7 @@ def mount_extra_routes(
         return engine.tiered.save_config(updates)
 
     @app.get("/api/storage/tiered/stats")
+        _require_admin(request)
     async def get_tiered_stats(request: Request):
         uid = caller_id_fn(request)
         base = engine.get_storage_stats(user_id=uid)
@@ -242,11 +231,13 @@ def mount_extra_routes(
         return {**base, "tiered": tiered}
 
     @app.post("/api/storage/tiered/offload")
+        _require_admin(request)
     async def offload_cold(request: Request, evict_local: bool = True):
         caller_id_fn(request)
         return engine.tiered.offload_all_to_cold(evict_local=evict_local)
 
     @app.post("/api/storage/gc")
+        _require_admin(request)
     async def run_chunk_gc(request: Request):
         caller_id_fn(request)
         return engine.gc_chunks()
@@ -257,6 +248,7 @@ def mount_extra_routes(
         return engine.empty_trash(user_id=uid)
 
     @app.post("/api/trash/purge-expired")
+        _require_admin(request)
     async def purge_expired_trash(request: Request, days: Optional[int] = None):
         caller_id_fn(request)
         return engine.purge_expired_trash(retention_days=days)

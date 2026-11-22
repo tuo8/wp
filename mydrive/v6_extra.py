@@ -933,10 +933,12 @@ def h_user_reset_password(ctx, req: dict) -> dict:
 
 
 def h_user_change_password(ctx, req: dict) -> dict:
-    target = (req or {}).get("identity") or ctx.uid or ""
-    record = ctx.auth.get_user(target)
-    if not record:
-        raise ExtraError(NOT_FOUND, "user not found")
+    if not ctx.uid:
+        raise ExtraError(UNAUTHENTICATED, "login required")
+    requested = (req or {}).get("identity") or ""
+    if requested and str(requested) != str(ctx.uid):
+        raise ExtraError(PERMISSION_DENIED, "cannot change another user's password")
+    target = ctx.uid
     result = ctx.auth.change_password(
         target, (req or {}).get("old_password") or "", (req or {}).get("new_password") or "")
     if not result.get("success"):
@@ -945,14 +947,16 @@ def h_user_change_password(ctx, req: dict) -> dict:
 
 
 def h_user_delete(ctx, req: dict) -> dict:
-    target = (req or {}).get("identity") or ctx.uid or ""
-    record = ctx.auth.get_user(target)
-    if not record:
-        raise ExtraError(NOT_FOUND, "user not found")
+    if not ctx.uid:
+        raise ExtraError(UNAUTHENTICATED, "login required")
+    requested = (req or {}).get("identity") or ""
+    if requested and str(requested) != str(ctx.uid):
+        raise ExtraError(PERMISSION_DENIED, "cannot delete another user's account")
+    target = ctx.uid
     result = ctx.auth.delete_user(target, (req or {}).get("password") or "")
     if not result.get("success"):
         raise ExtraError(PERMISSION_DENIED, result.get("error", "delete failed"))
-    return _user_pb(ctx, record)
+    return _user_pb(ctx, ctx.auth.get_user(target) or {"user_id": target})
 
 
 def h_user_update(ctx, req: dict) -> dict:
@@ -965,7 +969,8 @@ def h_user_update(ctx, req: dict) -> dict:
     if patch:
         ctx.auth.update_profile(ctx.uid, **patch)
     if (req or {}).get("password"):
-        result = ctx.auth.change_password(ctx.uid, "", (req or {}).get("password"))
+        result = ctx.auth.change_password(
+            ctx.uid, (req or {}).get("old_password") or "", (req or {}).get("password"))
         if not result.get("success"):
             raise ExtraError(INVALID_ARGUMENT, result.get("error", "update failed"))
     return _user_pb(ctx, ctx.auth.get_user(ctx.uid))

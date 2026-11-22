@@ -131,7 +131,8 @@ def main():
                                        {"phone": phone, "country_code": "+86", "type": 1}))
     sms = pb.decode("SmsVeifyCodeSendResponse", body) if body else {}
     code = sms.get("captcha", "")
-    check("SendSmsVerifyCodeNotUser 返回 6 位码", len(code) == 6 and code.isdigit(), sms)
+    sms_debug = os.environ.get("EXPECT_SMS_DEBUG", "0").lower() in ("1", "true", "yes")
+    check("SMS 验证码仅在显式调试模式返回", (len(code) == 6 and code.isdigit()) if sms_debug else not code, sms)
 
     status, body, msg = call("PubUser", "ResetPassword",
                              pb.encode("LoginRequest", {"identity": name, "password": "newpass_987",
