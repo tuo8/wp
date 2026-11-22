@@ -61,6 +61,9 @@ class AuthManager:
                 bytes_used INTEGER DEFAULT 0
             )
         """)
+        user_cols = {row[1] for row in c.execute("PRAGMA table_info(users)")}
+        if "token_version" not in user_cols:
+            c.execute("ALTER TABLE users ADD COLUMN token_version INTEGER NOT NULL DEFAULT 0")
         c.execute("""
             CREATE TABLE IF NOT EXISTS refresh_tokens (
                 token TEXT PRIMARY KEY,
@@ -198,9 +201,17 @@ class AuthManager:
     def _make_jwt(self, user_id: str, username: str, expires_in: int = 3600) -> str:
         header = {"alg": "HS256", "typ": "JWT"}
         now = int(time.time())
+        conn = connect_db(self.db_path)
+        c = conn.cursor()
+        c.execute("SELECT token_version FROM users WHERE user_id = ?", (user_id,))
+        row = c.fetchone()
+        conn.close()
+        if not row:
+            return ""
         payload = {
             "user_id": user_id,
             "username": username,
+            "ver": int(row[0] or 0),
             "iat": now,
             "exp": now + expires_in,
         }
@@ -234,8 +245,14 @@ class AuthManager:
 
         if int(time.time()) > payload.get("exp", 0):
             return None
-
-        return {"user_id": payload["user_id"], "username": payload["username"]}
+        conn = connect_db(self.db_path)
+        c = conn.cursor()
+        c.execute("SELECT username, token_version FROM users WHERE user_id = ?", (payload.get("user_id"),))
+        user = c.fetchone()
+        conn.close()
+        if not user or int(payload.get("ver", 0)) != int(user[1] or 0):
+            return None
+        return {"user_id": payload["user_id"], "username": user[0]}
 
     def refresh(self, refresh_token: str) -> dict:
         conn = connect_db(self.db_path)
@@ -427,7 +444,7 @@ class AuthManager:
             return {"success": False, "error": "Wrong password"}
         new_salt = secrets.token_hex(16)
         new_hash = self._hash_password(new_password, new_salt)
-        c.execute("UPDATE users SET password_hash = ?, password_salt = ? WHERE user_id = ?",
+        c.execute("UPDATE users SET password_hash = ?, password_salt = ?, token_version = token_version + 1 WHERE user_id = ?",
                   (new_hash, new_salt, user_id))
         c.execute("DELETE FROM refresh_tokens WHERE user_id = ?", (user_id,))
         conn.commit()
@@ -472,7 +489,7 @@ class AuthManager:
             return {"success": False, "error": "Invalid or expired SMS code"}
         new_salt = secrets.token_hex(16)
         new_hash = self._hash_password(new_password, new_salt)
-        c.execute("UPDATE users SET password_hash = ?, password_salt = ? WHERE user_id = ?",
+        c.execute("UPDATE users SET password_hash = ?, password_salt = ?, token_version = token_version + 1 WHERE user_id = ?",
                   (new_hash, new_salt, user_id))
         c.execute("DELETE FROM refresh_tokens WHERE user_id = ?", (user_id,))
         conn.commit()
@@ -508,6 +525,7 @@ class AuthManager:
             c.execute("DELETE FROM refresh_tokens WHERE token = ?", (refresh_token,))
         elif user_id:
             c.execute("DELETE FROM refresh_tokens WHERE user_id = ?", (user_id,))
+            c.execute("UPDATE users SET token_version = token_version + 1 WHERE user_id = ?", (user_id,))
         conn.commit()
         conn.close()
         return {"success": True}

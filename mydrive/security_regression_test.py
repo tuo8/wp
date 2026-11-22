@@ -30,16 +30,25 @@ class AuthSecurityTests(unittest.TestCase):
         self.assertTrue(result["success"], result)
         return result["user_id"]
 
-    def test_password_change_requires_current_password(self):
-        uid = self.create_user()
+    def test_password_change_requires_current_password_and_revokes_access(self):
+        user = self.auth.register("security_user", "InitialPass_123")
+        self.assertTrue(user["success"], user)
+        uid = user["user_id"]
+        access_token = user["access_token"]
+        self.assertIsNotNone(self.auth.verify_token(access_token))
         self.assertFalse(self.auth.change_password(uid, "", "NewPassphrase_123")["success"])
         self.assertFalse(self.auth.change_password(uid, "incorrect", "NewPassphrase_123")["success"])
         self.assertTrue(self.auth.change_password(uid, "InitialPass_123", "NewPassphrase_123")["success"])
+        self.assertIsNone(self.auth.verify_token(access_token))
         self.assertFalse(self.auth.login("security_user", "InitialPass_123")["success"])
         self.assertTrue(self.auth.login("security_user", "NewPassphrase_123")["success"])
 
-    def test_reset_requires_one_time_code_for_recovery_phone(self):
-        uid = self.create_user()
+    def test_reset_requires_one_time_code_for_recovery_phone_and_revokes_access(self):
+        user = self.auth.register("security_user", "InitialPass_123")
+        uid = user["user_id"]
+        old_access = user["access_token"]
+        old_refresh = user["refresh_token"]
+        self.assertIsNotNone(self.auth.verify_token(old_access))
         self.assertFalse(self.auth.reset_password("security_user", "ResetPassphrase_123", "")["success"])
         self.auth.update_profile(uid, phone="+15551234567")
         conn = sqlite3.connect(self.auth.db_path)
@@ -51,6 +60,8 @@ class AuthSecurityTests(unittest.TestCase):
         conn.close()
         self.assertFalse(self.auth.reset_password("security_user", "ResetPassphrase_123", "000000")["success"])
         self.assertTrue(self.auth.reset_password("security_user", "ResetPassphrase_123", "123456")["success"])
+        self.assertIsNone(self.auth.verify_token(old_access))
+        self.assertFalse(self.auth.refresh(old_refresh)["success"])
         self.assertFalse(self.auth.reset_password("security_user", "ReplayPassphrase_123", "123456")["success"])
 
     def test_sms_codes_are_not_exposed_without_debug_flag(self):
@@ -65,6 +76,13 @@ class AuthSecurityTests(unittest.TestCase):
         self.assertTrue(self.auth.reserve_usage(uid, 80, 100))
         self.assertFalse(self.auth.reserve_usage(uid, 21, 100))
         self.assertEqual(self.auth.get_quota(uid)["used"], 80)
+
+    def test_account_wide_logout_revokes_access_token(self):
+        user = self.auth.register("logout_user", "InitialPass_123")
+        token = user["access_token"]
+        self.assertIsNotNone(self.auth.verify_token(token))
+        self.auth.logoff(user_id=user["user_id"])
+        self.assertIsNone(self.auth.verify_token(token))
 
     def test_account_removal_requires_password_confirmation(self):
         uid = self.create_user()

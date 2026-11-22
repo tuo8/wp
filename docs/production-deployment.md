@@ -30,6 +30,8 @@ The API, Slices, and optional SFTP ports bind to `PUBLIC_BIND_IP` (default `127.
 - `MYDRIVE_ENV=production` requires strong `MYDRIVE_SECRET`, `MYDRIVE_PRESIGN_SECRET`, and `ARIA2_SECRET` values at startup. Known development defaults are rejected.
 - `MYDRIVE_AUTH_REQUIRED=1` is mandatory for protected API routes.
 - `MYDRIVE_SMS_DEBUG=0` is mandatory in production. No real SMS gateway is implemented yet, so SMS-based recovery remains unavailable until a provider adapter is added. Do not enable debug code exposure on an internet-facing instance.
+- Passwords require at least 10 characters. Password changes, resets, and account-wide logout increment a token version, invalidating already-issued access tokens and refresh tokens.
+- Payment webhooks must sign the raw request body with `PAYMENT_WEBHOOK_SECRET` and include `order_no`, `amount_cents`, and `currency`; mismatched amounts/currencies are rejected. A real payment-provider adapter and live provider integration test are still required before accepting money.
 - `MAX_UPLOAD_BYTES` defaults to 10 GiB. Uploads are streamed to `UPLOAD_TEMP_DIR` and chunked from disk; ensure that volume has enough free space.
 - `AUTO_OFFLOAD_COLD=0` is the safe default until cold-storage integrity and restore drills have passed. Enable automated eviction only after backups and restore tests are verified.
 - `SFTP_ENABLE=0` by default. Enable only when required and restrict the port at the firewall.
