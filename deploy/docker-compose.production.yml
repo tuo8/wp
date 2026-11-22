@@ -1,0 +1,85 @@
+services:
+  mydrive:
+    image: mydrive-api:${MYDRIVE_IMAGE_TAG:-local}
+    build:
+      context: ..
+      dockerfile: Dockerfile
+      args:
+        PYTHON_BASE_IMAGE: ${PYTHON_BASE_IMAGE:?Set PYTHON_BASE_IMAGE to a reviewed Python image tag or digest}
+    container_name: mydrive-api
+    environment:
+      MYDRIVE_ENV: production
+      MYDRIVE_AUTH_REQUIRED: "1"
+      MYDRIVE_SECRET: ${MYDRIVE_SECRET:?Set a random MYDRIVE_SECRET of at least 32 characters}
+      MYDRIVE_PRESIGN_SECRET: ${MYDRIVE_PRESIGN_SECRET:?Set a separate random presign secret of at least 32 characters}
+      ARIA2_SECRET: ${ARIA2_SECRET:?Set a random ARIA2_SECRET of at least 32 characters}
+      ADMIN_USERS: ${ADMIN_USERS:?Set ADMIN_USERS to one or more trusted usernames or user IDs}
+      PAYMENT_WEBHOOK_SECRET: ${PAYMENT_WEBHOOK_SECRET:?Set PAYMENT_WEBHOOK_SECRET}
+      MYDRIVE_SMS_DEBUG: "0"
+      STORAGE_ROOT: /data/storage
+      UPLOAD_TEMP_DIR: /data/storage/tmp_uploads
+      MAX_UPLOAD_BYTES: ${MAX_UPLOAD_BYTES:-10737418240}
+      PORT: "8765"
+      ARIA2_EXE: /usr/bin/aria2c
+      ARIA2_PORT: "6800"
+      ARIA2_DHT_PORT: "6881"
+      SFTP_ENABLE: ${SFTP_ENABLE:-0}
+      SFTP_BIND: 0.0.0.0
+      SFTP_PORT: "2022"
+      SLICES_ENABLE: ${SLICES_ENABLE:-1}
+      SLICES_PORT: "8766"
+      OFFLINE_AUTO_CLEANUP: "1"
+      COLD_STORAGE_TYPE: s3
+      S3_ENDPOINT: http://minio:9000
+      S3_BUCKET: mydrive-cold
+      S3_ACCESS_KEY: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER}
+      S3_SECRET_KEY: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD}
+      S3_REGION: us-east-1
+      LOCAL_CACHE_MAX_BYTES: ${LOCAL_CACHE_MAX_BYTES:-2147483648}
+      AUTO_OFFLOAD_COLD: "0"
+    volumes:
+      - mydrive_data:/data/storage
+    ports:
+      - "${PUBLIC_BIND_IP:-127.0.0.1}:8765:8765"
+      - "${PUBLIC_BIND_IP:-127.0.0.1}:8766:8766"
+      - "${PUBLIC_BIND_IP:-127.0.0.1}:2022:2022"
+    depends_on:
+      - minio
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; s=socket.create_connection(('127.0.0.1',8765),3); s.close()"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+
+  minio:
+    image: ${MINIO_IMAGE:?Set MINIO_IMAGE to a reviewed, pinned MinIO tag or digest}
+    container_name: mydrive-minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD}
+    volumes:
+      - minio_data:/data
+    expose:
+      - "9000"
+      - "9001"
+    restart: unless-stopped
+
+  minio-init:
+    image: ${MINIO_MC_IMAGE:?Set MINIO_MC_IMAGE to a reviewed, pinned MinIO client tag or digest}
+    depends_on:
+      - minio
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ROOT_USER:?Set MINIO_ROOT_USER}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_PASSWORD:?Set MINIO_ROOT_PASSWORD}
+    entrypoint: ["/bin/sh", "-ec"]
+    command: |
+      until mc alias set local http://minio:9000 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD"; do sleep 2; done
+      mc mb --ignore-existing local/mydrive-cold
+    restart: "no"
+
+volumes:
+  mydrive_data:
+  minio_data:
