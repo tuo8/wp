@@ -58,6 +58,18 @@ class RemotePrimaryStorageTests(unittest.TestCase):
         self.assertEqual(self.engine.get_chunk(cid), data)
         self.assertFalse(self.engine._chunk_path(cid).exists())
 
+    def test_existing_local_block_is_migrated_on_read(self):
+        data = b"legacy local block" * 200
+        from cid_engine import compute_cid
+        cid = compute_cid(data)
+        self.engine.tiered.config["primary_storage"] = False
+        self.engine._store_chunk(cid, data)
+        self.assertTrue(self.engine._chunk_path(cid).exists())
+        self.engine.tiered.config["primary_storage"] = True
+        self.assertEqual(self.engine.get_chunk(cid), data)
+        self.assertFalse(self.engine._chunk_path(cid).exists())
+        self.assertEqual(self.backend.get_chunk(self.engine.tiered._cold_key(cid)), data)
+
     def test_xor_encoded_block_round_trips(self):
         data = b"offline encoded content" * 300
         from cid_engine import compute_cid

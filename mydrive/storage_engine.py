@@ -783,7 +783,12 @@ class StorageEngine:
         chunk_path = self._chunk_path(cid)
         if chunk_path.exists():
             raw = chunk_path.read_bytes()
-            if hasattr(self, "tiered"):
+            if getattr(self.tiered, "primary_storage_enabled", False):
+                # Lazy migration: once the remote copy is verified, evict the
+                # legacy local block. Keep serving the already-read bytes if
+                # migration is temporarily unavailable.
+                self.tiered.ensure_primary_chunk(cid)
+            else:
                 self.tiered.touch(cid)
             fmt = self.chunk_format(cid)
             if fmt == CHUNK_FMT_PLAIN:
@@ -818,7 +823,9 @@ class StorageEngine:
                 return remote
         chunk_path = self._chunk_path(cid)
         if chunk_path.exists():
-            if hasattr(self, "tiered"):
+            if getattr(self.tiered, "primary_storage_enabled", False):
+                self.tiered.ensure_primary_chunk(cid)
+            else:
                 self.tiered.touch(cid)
             return chunk_path.read_bytes()
         if hasattr(self, "tiered") and self.tiered.backend is not None:
