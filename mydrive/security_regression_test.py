@@ -66,6 +66,22 @@ class AuthSecurityTests(unittest.TestCase):
         self.assertFalse(self.auth.refresh(old_refresh)["success"])
         self.assertFalse(self.auth.reset_password("security_user", "ReplayPassphrase_123", "123456")["success"])
 
+    def test_production_auth_requires_a_strong_non_default_secret(self):
+        with tempfile.TemporaryDirectory(prefix="missing-prod-secret-") as root:
+            with patch.dict(os.environ, {"MYDRIVE_ENV": "production"}, clear=False):
+                os.environ.pop("MYDRIVE_SECRET", None)
+                with self.assertRaises(RuntimeError):
+                    AuthManager(root)
+        with tempfile.TemporaryDirectory(prefix="weak-prod-secret-") as root:
+            with patch.dict(os.environ, {"MYDRIVE_ENV": "production", "MYDRIVE_SECRET": "short"}):
+                with self.assertRaises(RuntimeError):
+                    AuthManager(root)
+        with tempfile.TemporaryDirectory(prefix="strong-prod-secret-") as root:
+            secret = "production-secret-" + "x" * 40
+            with patch.dict(os.environ, {"MYDRIVE_ENV": "production", "MYDRIVE_SECRET": secret}):
+                auth = AuthManager(root)
+                self.assertEqual(auth.secret_key, secret)
+
     def test_sms_codes_are_not_exposed_without_debug_flag(self):
         self.assertFalse(self.auth.send_sms_code("+15551234567")["success"])
         with patch.dict(os.environ, {"MYDRIVE_SMS_DEBUG": "1"}):
