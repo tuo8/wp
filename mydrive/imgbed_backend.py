@@ -39,9 +39,13 @@ class ImgBedBackend:
 
     @classmethod
     def from_env(cls):
+        admin_user = os.environ.get("IMGBED_ADMIN_USERNAME", "")
+        admin_password = os.environ.get("IMGBED_ADMIN_PASSWORD", "")
+        primary = os.environ.get("IMGBED_PRIMARY_STORAGE", "0").lower() in ("1", "true", "yes")
+        if primary and (not admin_user or not admin_password):
+            raise ValueError("ImgBed primary mode requires IMGBED_ADMIN_USERNAME and IMGBED_ADMIN_PASSWORD for safe remote garbage collection")
         return cls(os.environ.get("IMGBED_BASE_URL", ""), os.environ.get("IMGBED_AUTH_CODE", ""),
-                   os.environ.get("IMGBED_ADMIN_USERNAME", ""), os.environ.get("IMGBED_ADMIN_PASSWORD", ""),
-                   float(os.environ.get("IMGBED_TIMEOUT", "60")))
+                   admin_user, admin_password, float(os.environ.get("IMGBED_TIMEOUT", "60")))
 
     @staticmethod
     def _remote_id(key: str) -> str:

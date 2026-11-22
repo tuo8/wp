@@ -87,6 +87,25 @@ class ImgBedPrimaryStorageTests(unittest.TestCase):
             self.assertTrue(local.exists()); self.assertTrue(m.ensure_primary_chunk(cid))
             self.assertEqual(m.backend.objects[m._cold_key(cid)],data)
 
+    def test_remote_delete_failure_preserves_local_and_tier_record(self):
+        class FailingDelete:
+            kind="imgbed"
+            def delete_chunk(self,key): return False
+        with tempfile.TemporaryDirectory() as root:
+            p=Path(root); (p/"db").mkdir()
+            m=TieredStorageManager(root,p/"db/index.sqlite",p/"chunks")
+            m.backend=FailingDelete()
+            cid="bafybeigdyrzt5sfp7udm7hu76v3r2m4j5x6k7q8w9e0a1b2c3d4e5f6g7h"
+            local=m._local_path(cid); local.parent.mkdir(parents=True,exist_ok=True); local.write_bytes(b"keep-me")
+            db=__import__("sqlite3").connect(m.db_path)
+            db.execute("INSERT INTO chunk_tiers (cid,raw_size,stored_size,in_local,in_cold,cold_backend) VALUES (?,7,7,1,1,'imgbed')",(cid,))
+            db.commit(); db.close()
+            self.assertEqual(m.delete_chunk_everywhere(cid),0)
+            self.assertTrue(local.exists())
+            db=__import__("sqlite3").connect(m.db_path)
+            self.assertIsNotNone(db.execute("SELECT cid FROM chunk_tiers WHERE cid=?",(cid,)).fetchone())
+            db.close()
+
     def test_hydration_rejects_different_backend(self):
         class Other:
             kind="imgbed"

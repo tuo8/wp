@@ -649,31 +649,37 @@ class TieredStorageManager:
         return {"offloaded": offloaded, "freed_bytes": freed}
 
     def delete_chunk_everywhere(self, cid: str) -> int:
-        """Delete a no-longer-referenced chunk from local and cold tiers."""
+        """Delete a no-longer-referenced chunk without losing retryability."""
         with self._lock:
-            freed = 0
             local = self._local_path(cid)
+            conn = connect_db(self.db_path)
+            c = conn.cursor()
+            c.execute("SELECT cold_backend, in_cold FROM chunk_tiers WHERE cid = ?", (cid,))
+            tier = c.fetchone()
+            conn.close()
+
+            # Delete the authoritative remote object first. If ImgBed/S3 is
+            # unavailable, keep the local copy and tier record for a later retry.
+            if tier and int(tier[1] or 0):
+                if not self.backend:
+                    return 0
+                recorded_backend = str(tier[0] or "")
+                if recorded_backend and recorded_backend != self.backend.kind:
+                    return 0
+                try:
+                    if not self.backend.delete_chunk(self._cold_key(cid)):
+                        return 0
+                except Exception:
+                    return 0
+
+            freed = 0
             if local.exists():
-                freed += local.stat().st_size
+                freed = local.stat().st_size
                 try:
                     local.unlink()
                 except OSError:
                     return 0
-            if self.backend:
-                try:
-                    conn = connect_db(self.db_path)
-                    c = conn.cursor()
-                    c.execute("SELECT cold_backend, in_cold FROM chunk_tiers WHERE cid = ?", (cid,))
-                    tier = c.fetchone()
-                    conn.close()
-                    if tier and int(tier[1] or 0):
-                        recorded_backend = str(tier[0] or "")
-                        if recorded_backend and recorded_backend != self.backend.kind:
-                            return freed
-                        if not self.backend.delete_chunk(self._cold_key(cid)):
-                            return freed
-                except Exception:
-                    return freed
+
             conn = connect_db(self.db_path)
             c = conn.cursor()
             c.execute("DELETE FROM chunk_tiers WHERE cid = ?", (cid,))
