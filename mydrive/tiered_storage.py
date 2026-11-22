@@ -341,6 +341,12 @@ class TieredStorageManager:
                 cfg.update(saved)
             except Exception:
                 pass
+        # Deployment environment must override stale persisted backend selection,
+        # otherwise a previous S3 setting could silently mask ImgBed activation.
+        if "COLD_STORAGE_TYPE" in os.environ:
+            cfg["cold_type"] = os.environ["COLD_STORAGE_TYPE"].strip().lower()
+        if "IMGBED_PRIMARY_STORAGE" in os.environ:
+            cfg["primary_storage"] = os.environ["IMGBED_PRIMARY_STORAGE"].lower() in ("1", "true", "yes")
         return cfg
 
     def save_config(self, updates: dict) -> dict:
@@ -388,8 +394,10 @@ class TieredStorageManager:
         else:
             self.backend = None
 
+        if self.config.get("primary_storage") and kind != "imgbed":
+            raise RuntimeError("IMGBED_PRIMARY_STORAGE=1 requires COLD_STORAGE_TYPE=imgbed")
         if self.config.get("primary_storage") and self.backend is None:
-            raise RuntimeError("IMGBED_PRIMARY_STORAGE is enabled but the configured cold backend is unavailable")
+            raise RuntimeError("IMGBED_PRIMARY_STORAGE is enabled but the configured ImgBed backend is unavailable")
 
     def _init_db(self):
         conn = connect_db(self.db_path)

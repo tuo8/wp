@@ -47,6 +47,26 @@ class ImgBedBackendTests(unittest.TestCase):
 
 
 class ImgBedPrimaryStorageTests(unittest.TestCase):
+    def test_environment_overrides_stale_saved_s3_backend(self):
+        import os
+        from unittest.mock import patch
+        with tempfile.TemporaryDirectory() as root:
+            p=Path(root); (p/"json").mkdir(parents=True)
+            (p/"json/tiered_storage.json").write_text(
+                '{"cold_type":"s3","s3_endpoint":"http://old-minio:9000","s3_bucket":"old","primary_storage":false}',
+                encoding="utf-8",
+            )
+            values={
+                "COLD_STORAGE_TYPE":"imgbed","IMGBED_PRIMARY_STORAGE":"1",
+                "IMGBED_BASE_URL":"https://imgbed.example","IMGBED_AUTH_CODE":"code",
+                "IMGBED_ADMIN_USERNAME":"admin","IMGBED_ADMIN_PASSWORD":"password",
+            }
+            with patch.dict(os.environ,values):
+                m=TieredStorageManager(root,p/"db/index.sqlite",p/"chunks")
+            self.assertEqual(m.config["cold_type"],"imgbed")
+            self.assertTrue(m.config["primary_storage"])
+            self.assertEqual(m.backend.kind,"imgbed")
+
     def test_primary_mode_remote_verification_and_local_cache(self):
         class MemoryBackend:
             kind="imgbed"
