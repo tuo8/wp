@@ -1,0 +1,22 @@
+# Runtime secrets and deployment environment files
+.env
+.env.*
+!deploy/.env.production.example
+!deploy/.env.cluster.example
+deploy/.env.production
+deploy/.env.cluster
+
+# Local runtime data and databases
+storage_data/
+data/
+*.sqlite
+*.sqlite3
+*.db
+*.log
+
+# Python caches and local test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.coverage
