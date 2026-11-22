@@ -44,3 +44,10 @@ jobs:
           MYDRIVE_ENV: development
           MYDRIVE_SECRET: postgres-smoke-test-secret-which-is-long-enough
         run: python -m unittest -v postgres_smoke_test
+      - name: Validate production Compose configuration
+        run: |
+          cp deploy/.env.production.example deploy/.env.production
+          docker compose --env-file deploy/.env.production -f deploy/docker-compose.production.yml config --quiet
+          rm deploy/.env.production
+      - name: Build production container image
+        run: docker build --build-arg PYTHON_BASE_IMAGE=python:3.11-slim-bookworm -t mydrive-ci:test .
