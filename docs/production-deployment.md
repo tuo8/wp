@@ -1,6 +1,6 @@
 # MyDrive production deployment (single node)
 
-This deployment profile is intentionally single-node and uses SQLite for the local metadata stores plus MinIO for cold objects. It does **not** certify the existing multi-instance/PostgreSQL compose file as production-ready: several modules still open SQLite databases directly, so cluster-wide transaction consistency must be fixed and tested before scaling API replicas.
+This deployment profile is intentionally single-node and uses SQLite for local metadata plus MinIO for cold objects. Active API modules now route their metadata operations through the shared database adapter, but the legacy `offline_downloader.py` helper still opens a separate SQLite file and is not wired into the active API runtime. The multi-instance/PostgreSQL compose file remains experimental until that legacy path is migrated or explicitly retired and a real PostgreSQL integration/restore test suite passes.
 
 ## 1. Prepare secrets and environment
 
@@ -40,7 +40,7 @@ Back up the complete `mydrive_data` volume and the `minio_data` volume consisten
 
 ## 5. Current production-readiness limits
 
-- Multi-node PostgreSQL mode is not yet certified because `share_manager.py`, `tiered_storage.py`, and other paths still use direct SQLite connections.
+- Multi-node PostgreSQL mode is not yet certified. The adapter has compatibility support for active managers, but no real PostgreSQL end-to-end test or failover/restore drill has been run; the legacy `offline_downloader.py` helper remains SQLite-only.
 - SMS provider delivery and verified phone-binding are not implemented; debug codes are disabled by default.
 - DNS validation in offline download is an application-layer defense; production network policy should also deny outbound access to private, loopback, link-local, and cloud metadata ranges.
 - Cold-tier eviction remains disabled by default until integrity, concurrency, and disaster-recovery tests are completed.

@@ -1,7 +1,7 @@
 version: "3.9"
 
-# EXPERIMENTAL ONLY: not production-certified while some modules still use direct SQLite connections.
-# Do not scale API replicas until the database audit and multi-node consistency tests are complete.
+# EXPERIMENTAL ONLY: no PostgreSQL end-to-end, failover, or restore certification yet.
+# The legacy offline_downloader.py helper remains SQLite-only and is not wired into the active API.
 
 x-api-env: &api-env
   MYDRIVE_ENV: production
