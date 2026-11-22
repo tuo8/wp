@@ -10,6 +10,7 @@
 from __future__ import annotations
 
 import hashlib
+import ipaddress
 import json
 import os
 import re
@@ -21,6 +22,7 @@ import threading
 import time
 import urllib.error
 import urllib.request
+from urllib.parse import parse_qs, urlsplit
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
@@ -33,6 +35,56 @@ ST_ERROR = -1            # 错误
 
 TYPE_BT = 5050
 TYPE_HTTP = 5000
+
+MAX_TORRENT_METADATA_BYTES = 16 * 1024 * 1024
+
+
+class _NoRedirectHandler(urllib.request.HTTPRedirectHandler):
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+def _validate_public_endpoint(url: str, allowed_schemes=("http", "https", "udp")):
+    """Reject non-public destinations before an offline task can reach the network."""
+    parsed = urlsplit(url)
+    if parsed.scheme.lower() not in allowed_schemes or not parsed.hostname:
+        raise ValueError("Only public HTTP(S) URLs and public torrent trackers are allowed")
+    if parsed.username or parsed.password:
+        raise ValueError("URLs containing embedded credentials are not allowed")
+    host = parsed.hostname.rstrip(".").lower()
+    if host in ("localhost",) or host.endswith((".localhost", ".local", ".internal", ".home", ".lan")):
+        raise ValueError("Local network destinations are not allowed")
+    try:
+        addresses = [ipaddress.ip_address(host)]
+    except ValueError:
+        try:
+            infos = socket.getaddrinfo(host, parsed.port or (443 if parsed.scheme.lower() == "https" else 80),
+                                       type=socket.SOCK_STREAM)
+            addresses = list({ipaddress.ip_address(info[4][0].split("%", 1)[0]) for info in infos})
+        except (OSError, ValueError):
+            raise ValueError("Unable to resolve download host")
+    if not addresses or any(not address.is_global for address in addresses):
+        raise ValueError("Private, loopback, link-local, or reserved network destinations are not allowed")
+    return parsed
+
+
+def _validate_download_url(url: str):
+    value = (url or "").strip()
+    if value.lower().startswith("magnet:"):
+        trackers = parse_qs(urlsplit(value).query).get("tr", [])
+        for tracker in trackers:
+            _validate_public_endpoint(tracker)
+        return
+    _validate_public_endpoint(value, allowed_schemes=("http", "https"))
+
+
+def _safe_urlopen(request, timeout: float):
+    """Open only a prevalidated public URL, without environment proxies or redirects."""
+    target = request.full_url if isinstance(request, urllib.request.Request) else str(request)
+    _validate_public_endpoint(target, allowed_schemes=("http", "https"))
+    opener = urllib.request.build_opener(urllib.request.ProxyHandler({}), _NoRedirectHandler())
+    return opener.open(request, timeout=timeout)
+
 
 B32 = "abcdefghijklmnopqrstuvwxyz234567"
 
@@ -548,6 +600,7 @@ class OfflineEngine:
         url = (url or "").strip()
         if not url:
             return {"meta": {}, "task_files": []}
+        _validate_download_url(url)
         if url.startswith("magnet:"):
             infohash = infohash_from_magnet(url)
             meta = self._meta_cache_get(infohash) if infohash else None
@@ -619,6 +672,7 @@ class OfflineEngine:
 
     def _fetch_metadata(self, url: str, infohash: str, timeout: float) -> Optional[dict]:
         """用 aria2 以 metadata-only 模式抓 .torrent，成功则缓存并返回。"""
+        _validate_download_url(url)
         if not self.aria2.alive() and not self.aria2.start(wait=6):
             return None
         cached = self._find_torrent(infohash) if infohash else None
@@ -633,6 +687,7 @@ class OfflineEngine:
                     "pause-metadata": "false",
                     "bt-tracker-connect-timeout": "5",
                     "bt-tracker-timeout": "5",
+                    "max-redirect": "0",
                 })
             except Aria2Error:
                 return None
@@ -661,14 +716,15 @@ class OfflineEngine:
         return meta
 
     def _fetch_torrent_url(self, url: str, want_path: bool = False):
-        """下载远端 .torrent 并解析（want_path=True 时返回本地路径）。"""
+        """下载远端 .torrent 并解析；拒绝私网目标、重定向和超大元数据。"""
+        _validate_download_url(url)
         key = hashlib.sha1(url.encode()).hexdigest()[:40]
         path = self.meta_dir / f"{key}.torrent"
         try:
             if not path.exists():
-                with urllib.request.urlopen(url, timeout=20) as resp:
-                    data = resp.read()
-                if not data.startswith(b"d"):
+                with _safe_urlopen(url, timeout=20) as resp:
+                    data = resp.read(MAX_TORRENT_METADATA_BYTES + 1)
+                if len(data) > MAX_TORRENT_METADATA_BYTES or not data.startswith(b"d"):
                     return None
                 path.write_bytes(data)
             if want_path:
@@ -687,8 +743,9 @@ class OfflineEngine:
     @staticmethod
     def _remote_size(url: str) -> int:
         try:
+            _validate_download_url(url)
             req = urllib.request.Request(url, method="HEAD")
-            with urllib.request.urlopen(req, timeout=8) as resp:
+            with _safe_urlopen(req, timeout=8) as resp:
                 return int(resp.headers.get("content-length") or 0)
         except Exception:
             return 0
@@ -698,6 +755,7 @@ class OfflineEngine:
         url = (req or {}).get("url") or ""
         if not url:
             raise ValueError("url required")
+        _validate_download_url(url)
         save_path = req.get("save_path") or "/"
         name = req.get("name") or ""
         ignore = req.get("ignore_files") or []
@@ -771,7 +829,7 @@ class OfflineEngine:
             opts = {"dir": str(self.download_root), "bt-save-metadata": "true",
                     "follow-torrent": "true", "seed-time": "0",
                     "allow-overwrite": "true", "auto-file-renaming": "false",
-                    "continue": "true"}
+                    "continue": "true", "max-redirect": "0"}
             selected_files = req.get("selected_files") or []
             if infohash:
                 opts["bt-remove-unselected-file"] = "false"
