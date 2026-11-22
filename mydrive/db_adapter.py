@@ -152,6 +152,10 @@ class PgCursorWrapper:
     def fetchone(self):
         return self._wrap(self._cur.fetchone())
 
+    def __iter__(self):
+        for row in self._cur:
+            yield self._wrap(row)
+
     def fetchall(self):
         rows = self._cur.fetchall()
         if not rows or not self._cur.description:

@@ -249,6 +249,8 @@ class _FakePgCursor:
     def fetchone(self):
         rows = self.fetchall()
         return rows[0] if rows else None
+    def __iter__(self):
+        return iter(self.fetchall())
 
 
 class DatabaseAdapterTests(unittest.TestCase):
@@ -258,6 +260,8 @@ class DatabaseAdapterTests(unittest.TestCase):
         cursor.execute("PRAGMA table_info(files)")
         row = cursor.fetchone()
         self.assertEqual(row[1], "identity")
+        cursor.execute("PRAGMA table_info(files)")
+        self.assertEqual(list(cursor)[0][1], "identity")
         self.assertIn("information_schema.columns", raw.sql)
         self.assertEqual(raw.params, ("files",))
 
