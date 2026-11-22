@@ -22,6 +22,7 @@ import time
 import base64
 import hashlib
 import tempfile
+import threading
 from typing import Optional, List, Dict
 from fastapi import FastAPI, UploadFile, File, HTTPException, Query, Request, Response, Body
 from fastapi.responses import StreamingResponse, JSONResponse, FileResponse, HTMLResponse
@@ -82,6 +83,35 @@ sync_mgr = SyncManager(engine)
 p2p_server = P2PSignalingServer(engine)
 
 app = FastAPI(title="MyDrive API", version="0.2.0")
+
+
+@app.on_event("startup")
+async def migrate_legacy_local_blocks_to_remote_primary():
+    """Move pre-existing local chunk payloads to the authoritative remote backend.
+
+    The migration runs in the background so the API can become available
+    immediately. A failed remote write never evicts the local source copy.
+    """
+    if not getattr(engine.tiered, "primary_storage_enabled", False):
+        return
+
+    def _migrate():
+        try:
+            result = engine.tiered.offload_all_to_cold(evict_local=True)
+            print(
+                "[storage] remote-primary migration complete: "
+                f"offloaded={result.get('offloaded', 0)}, "
+                f"freed_bytes={result.get('freed_bytes', 0)}"
+            )
+        except Exception as exc:
+            print(f"[storage] remote-primary migration deferred: {exc}")
+
+    threading.Thread(
+        target=_migrate,
+        name="remote-primary-migration",
+        daemon=True,
+    ).start()
+
 
 # Mount WebDAV gateway (Basic auth against the same user database)
 webdav = WebDAVGateway(
