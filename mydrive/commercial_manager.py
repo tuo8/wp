@@ -17,7 +17,7 @@ import hmac
 import os
 import secrets
 import sqlite3
-from db_adapter import connect_db
+from db_adapter import connect_db, is_postgres_enabled
 import time
 from pathlib import Path
 from typing import Dict, List, Optional
@@ -52,7 +52,7 @@ PLANS: Dict[str, dict] = {
 
 def enable_sqlite_wal(db_path: Path):
     """Enable WAL mode & busy timeout for better multi-user concurrency."""
-    if not db_path.exists():
+    if is_postgres_enabled() or not db_path.exists():
         return
     try:
         conn = sqlite3.connect(str(db_path))
@@ -146,20 +146,30 @@ class CommercialManager:
             "available_plans": PLANS,
         }
 
+    def _set_membership_in_transaction(self, c, user_id: str, plan: str, duration_days: int, now: int):
+        duration_seconds = max(1, int(duration_days)) * 86400
+        expire_ts = 0 if plan == "free" else now + duration_seconds
+        c.execute(
+            """INSERT INTO user_memberships (user_id, plan, expire_ts, updated_at)
+               VALUES (?, ?, ?, ?)
+               ON CONFLICT(user_id) DO UPDATE SET
+                   plan=excluded.plan,
+                   expire_ts=CASE
+                       WHEN user_memberships.plan=excluded.plan AND user_memberships.expire_ts=0 THEN 0
+                       WHEN user_memberships.plan=excluded.plan AND user_memberships.expire_ts>excluded.updated_at
+                           THEN user_memberships.expire_ts + ?
+                       ELSE excluded.expire_ts
+                   END,
+                   updated_at=excluded.updated_at""",
+            (user_id, plan, expire_ts, now, duration_seconds),
+        )
+
     def set_membership(self, user_id: str, plan: str, duration_days: int = 30) -> dict:
         if plan not in PLANS:
             raise ValueError(f"Unknown plan: {plan}")
         now = int(time.time())
-        cur = self.get_membership(user_id)
-        base_ts = max(now, cur["expire_ts"]) if cur["plan"] == plan else now
-        expire_ts = 0 if plan == "free" else (base_ts + max(1, int(duration_days)) * 86400)
         with self._conn() as c:
-            c.execute(
-                "INSERT INTO user_memberships (user_id, plan, expire_ts, updated_at) "
-                "VALUES (?, ?, ?, ?) "
-                "ON CONFLICT(user_id) DO UPDATE SET plan=excluded.plan, expire_ts=excluded.expire_ts, updated_at=excluded.updated_at",
-                (user_id, plan, expire_ts, now),
-            )
+            self._set_membership_in_transaction(c, user_id, plan, duration_days, now)
         return self.get_membership(user_id)
 
     def generate_codes(self, plan: str = "vip", duration_days: int = 30, count: int = 1) -> List[dict]:
@@ -192,11 +202,15 @@ class CommercialManager:
                 raise ValueError("无效的兑换码")
             if row["used_by"]:
                 raise ValueError("该兑换码已被使用")
-            c.execute(
-                "UPDATE redeem_codes SET used_by = ?, used_at = ? WHERE code = ?",
+            claim = c.execute(
+                "UPDATE redeem_codes SET used_by = ?, used_at = ? "
+                "WHERE code = ? AND (used_by = '' OR used_by IS NULL)",
                 (user_id, now, code),
             )
-        return self.set_membership(user_id, row["plan"], int(row["duration_days"]))
+            if claim.rowcount != 1:
+                raise ValueError("该兑换码已被使用")
+            self._set_membership_in_transaction(c, user_id, row["plan"], int(row["duration_days"]), now)
+        return self.get_membership(user_id)
 
     # ==================== CONTENT MODERATION ====================
 
@@ -204,7 +218,8 @@ class CommercialManager:
         now = int(time.time())
         with self._conn() as c:
             c.execute(
-                "INSERT OR REPLACE INTO blocked_cids (cid, reason, blocked_at) VALUES (?, ?, ?)",
+                "INSERT INTO blocked_cids (cid, reason, blocked_at) VALUES (?, ?, ?) "
+                "ON CONFLICT(cid) DO UPDATE SET reason=excluded.reason, blocked_at=excluded.blocked_at",
                 (cid, reason, now),
             )
         return {"cid": cid, "blocked": True, "reason": reason, "blocked_at": now}
@@ -259,7 +274,10 @@ class CommercialManager:
         }
 
     def verify_webhook_signature(self, payload_bytes: bytes, signature: str) -> bool:
-        secret = os.environ.get("PAYMENT_WEBHOOK_SECRET", "mydrive-pay-secret")
+        secret = os.environ.get("PAYMENT_WEBHOOK_SECRET", "").strip()
+        runtime_mode = os.environ.get("MYDRIVE_ENV", "development").strip().lower()
+        if not secret or (runtime_mode in ("prod", "production") and len(secret) < 32):
+            return False
         expected = hmac.new(secret.encode("utf-8"), payload_bytes, hashlib.sha256).hexdigest()
         return hmac.compare_digest(expected, (signature or "").strip().lower())
 
@@ -271,9 +289,24 @@ class CommercialManager:
                 raise ValueError("Order not found")
             if row["status"] == "paid":
                 return dict(row)
-            c.execute("UPDATE payment_orders SET status = 'paid', paid_at = ? WHERE order_no = ?", (now, order_no))
-        membership = self.set_membership(row["user_id"], row["plan"], int(row["duration_days"]))
-        return {**dict(row), "status": "paid", "paid_at": now, "membership": membership}
+            if row["status"] != "pending":
+                raise ValueError("Order is not payable")
+            claim = c.execute(
+                "UPDATE payment_orders SET status = 'paid', paid_at = ? "
+                "WHERE order_no = ? AND status = 'pending'",
+                (now, order_no),
+            )
+            if claim.rowcount != 1:
+                current = c.execute("SELECT * FROM payment_orders WHERE order_no = ?", (order_no,)).fetchone()
+                if current and current["status"] == "paid":
+                    return dict(current)
+                raise ValueError("Order state changed; payment was not applied")
+            self._set_membership_in_transaction(
+                c, row["user_id"], row["plan"], int(row["duration_days"]), now)
+            result = dict(row)
+            result["status"] = "paid"
+            result["paid_at"] = now
+        return {**result, "membership": self.get_membership(row["user_id"])}
 
     def list_orders(self, user_id: Optional[str] = None, limit: int = 50) -> List[dict]:
         with self._conn() as c:

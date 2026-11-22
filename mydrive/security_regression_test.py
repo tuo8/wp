@@ -10,6 +10,7 @@ from auth_manager import AuthManager
 from offline_engine import _validate_download_url
 from share_manager import ShareManager
 from tiered_storage import TieredStorageManager
+from commercial_manager import CommercialManager
 
 
 class AuthSecurityTests(unittest.TestCase):
@@ -144,6 +145,47 @@ class TieredStorageIntegrityTests(unittest.TestCase):
         self.backend.corrupt_reads = False
         self.assertEqual(self.manager.hydrate_from_cold(self.cid), self.data)
         self.assertEqual(self.local.read_bytes(), self.data)
+
+
+class CommercialStateTests(unittest.TestCase):
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory(prefix="mydrive-commercial-test-")
+        self.manager = CommercialManager(self.tmp.name)
+
+    def tearDown(self):
+        self.tmp.cleanup()
+
+    def test_redeem_code_is_one_time(self):
+        code = self.manager.generate_codes(plan="vip", duration_days=30, count=1)[0]["code"]
+        membership = self.manager.redeem_code("buyer-1", code)
+        self.assertEqual(membership["plan"], "vip")
+        with self.assertRaises(ValueError):
+            self.manager.redeem_code("buyer-2", code)
+
+    def test_payment_callback_is_idempotent(self):
+        order = self.manager.create_order("buyer-1", plan="vip", duration_days=30)
+        first = self.manager.mark_order_paid(order["order_no"])
+        expiry = first["membership"]["expire_ts"]
+        second = self.manager.mark_order_paid(order["order_no"])
+        self.assertEqual(second["status"], "paid")
+        self.assertEqual(self.manager.get_membership("buyer-1")["expire_ts"], expiry)
+
+    def test_webhook_requires_configured_secret(self):
+        payload = b'{"order":"demo"}'
+        with patch.dict(os.environ, {"MYDRIVE_ENV": "production"}, clear=False):
+            os.environ.pop("PAYMENT_WEBHOOK_SECRET", None)
+            self.assertFalse(self.manager.verify_webhook_signature(payload, "anything"))
+        with patch.dict(os.environ, {"PAYMENT_WEBHOOK_SECRET": "s" * 40, "MYDRIVE_ENV": "production"}):
+            import hashlib, hmac
+            signature = hmac.new(("s" * 40).encode(), payload, hashlib.sha256).hexdigest()
+            self.assertTrue(self.manager.verify_webhook_signature(payload, signature))
+
+    def test_concurrent_membership_extensions_are_not_lost(self):
+        from concurrent.futures import ThreadPoolExecutor
+        with ThreadPoolExecutor(max_workers=5) as pool:
+            list(pool.map(lambda _: self.manager.set_membership("buyer-1", "vip", 1), range(5)))
+        expiry = self.manager.get_membership("buyer-1")["expire_ts"]
+        self.assertGreaterEqual(expiry, int(__import__("time").time()) + 4 * 86400)
 
 
 class OfflineSSRFTests(unittest.TestCase):
