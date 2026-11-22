@@ -1,0 +1,36 @@
+name: ImgBed temporary smoke test
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: ImgBed base URL
+        required: true
+        default: https://imgbed.tuo8.cc.cd
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Probe ImgBed endpoints without credentials
+        env:
+          BASE_URL: ${{ inputs.base_url }}
+        run: |
+          set +e
+          echo "Target: $BASE_URL"
+          for path in "/" "/file/invalid-smoke-test-id"; do
+            code=$(curl --connect-timeout 15 --max-time 30 -sS -o /tmp/body -w "%{http_code}" "$BASE_URL$path")
+            rc=$?
+            echo "GET $path curl_exit=$rc http=$code"
+            head -c 300 /tmp/body 2>/dev/null | tr '\n' ' '
+            echo
+          done
+          code=$(curl --connect-timeout 15 --max-time 30 -sS -X OPTIONS -o /tmp/body -w "%{http_code}" "$BASE_URL/upload")
+          rc=$?
+          echo "OPTIONS /upload curl_exit=$rc http=$code"
+          head -c 300 /tmp/body 2>/dev/null | tr '\n' ' '
+          echo
+          printf 'imgbed-smoke-test-only\n' > /tmp/imgbed-smoke.txt
+          code=$(curl --connect-timeout 15 --max-time 30 -sS -X POST -F 'file=@/tmp/imgbed-smoke.txt' -o /tmp/body -w "%{http_code}" "$BASE_URL/upload")
+          rc=$?
+          echo "POST /upload (no auth; expected rejection) curl_exit=$rc http=$code"
+          head -c 300 /tmp/body 2>/dev/null | tr '\n' ' '
+          echo
