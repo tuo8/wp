@@ -66,9 +66,10 @@ class RemotePrimaryStorageTests(unittest.TestCase):
         self.engine._store_chunk(cid, data)
         self.assertTrue(self.engine._chunk_path(cid).exists())
         self.engine.tiered.config["primary_storage"] = True
-        self.assertEqual(self.engine.get_chunk(cid), data)
+        self.assertEqual(self.engine.get_chunk_raw(cid), data)
         self.assertFalse(self.engine._chunk_path(cid).exists())
         self.assertEqual(self.backend.get_chunk(self.engine.tiered._cold_key(cid)), data)
+        self.assertEqual(self.engine.get_chunk(cid), data)
 
     def test_xor_encoded_block_round_trips(self):
         data = b"offline encoded content" * 300

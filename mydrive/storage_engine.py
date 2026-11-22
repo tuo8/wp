@@ -823,11 +823,12 @@ class StorageEngine:
                 return remote
         chunk_path = self._chunk_path(cid)
         if chunk_path.exists():
+            raw = chunk_path.read_bytes()
             if getattr(self.tiered, "primary_storage_enabled", False):
                 self.tiered.ensure_primary_chunk(cid)
             else:
                 self.tiered.touch(cid)
-            return chunk_path.read_bytes()
+            return raw
         if hasattr(self, "tiered") and self.tiered.backend is not None:
             raw = self.tiered.hydrate_from_cold(cid)
             if raw is not None:
