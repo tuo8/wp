@@ -40,6 +40,9 @@ jobs:
       - name: ImgBed storage adapter tests
         working-directory: mydrive
         run: python -m unittest -v imgbed_backend_test
+      - name: Remote-primary storage tests
+        working-directory: mydrive
+        run: python -m unittest -v remote_primary_storage_test
       - name: PostgreSQL integration smoke tests
         working-directory: mydrive
         env:
