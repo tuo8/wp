@@ -1,5 +1,0 @@
-{
-  "name": "hca-up-mb10-dedupe.bin",
-  "commit_http": 500,
-  "body": "{\"error\":\"failed to make file from blocks: block not found\"}\n"
-}

@@ -1,3 +1,0 @@
-904b3fd5d4e6c3dba96c8c7fc0c8f4730c319f289f4afb0c86691931f5721c87 *downloads/halalcloud_apk/base.apk
-3514540100dbcc20f5737c79fa072c37169facbb446c64fa6efdd275c1628c42 *downloads/halalcloud_apk/split_config.arm64_v8a.apk
-5c6d1b51c22072efefa4f2240ef2786e81532bb398540005388cb4659b25e166 *downloads/halalcloud_apk/split_config.zh.apk

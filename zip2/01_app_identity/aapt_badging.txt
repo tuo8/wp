@@ -1,8 +1,0 @@
-package: name='com.halalcloud.diskmanager.halalcloud' versionCode='24' versionName='1.0.24' platformBuildVersionName='16' platformBuildVersionCode='36' compileSdkVersion='36' compileSdkVersionCodename='16'
-sdkVersion:'24'
-targetSdkVersion:'36'
-uses-permission: name='android.permission.INTERNET'
-uses-permission: name='com.halalcloud.diskmanager.halalcloud.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION'
-application-label:'HalalCloud'
-application-icon-160:'res/mipmap-mdpi-v4/ic_launcher.png'
-application-icon-240:'res/mipmap-hdpi-v4/ic_launcher.png'
