@@ -1,9 +1,0 @@
-domain,category,evidence,observed_ip,purpose_confirmed_by
-drcdn2.2dland.cn,API,app 连接 + gRPC-Web 调用 + DNS/TLS,"119.188.175.5;221.204.163.72","App 运行时 connect 目标；gRPC-Web POST /v6.services.pub.PubUserFile/* 返回 200（server: envoy）"
-ucenter.2dland.cn,Auth,App 登录跳转 URL + DNS/TLS,"116.136.41 等 (116.136.159.41)","App 点击登录后由浏览器打开的 OAuth 授权页（login_type=authorization_code, client_id=devDebugger/1.0）"
-simple-file-proxy.2dland.cn,Upload,CreateUploadTask 返回的 upload_address + 实际上传 201,"101.26.38.162;101.72.219.132-174","POST /int/blocks/{session}/{cid} 返回 201；commit 返回文件记录（server: Byte-nginx）"
-slices.qzy.xyz,Slice,GetSliceDownloadAddress 返回的 download_address + 实际取块 200,"116.136.20.227;116.136.20.228","GET /ipfs/blocks/{a}/{bc}/{cid}?auth_key=... 返回加密块，按 encrypt 字段 XOR 后 SHA-256 匹配"
-ipfs-gateway.qzy.xyz,Gateway,GetDirectDownloadAddress 返回的 download_address + 整文件 200,"101.72.219.x;101.75.249.63-64","GET /file/{cid}/{uid}/{name} 返回 10 MiB 明文，SHA-256 匹配，支持 Range 206"
-drive.2dland.cn,WebClient,官方 Web 客户端入口,"116.136.159.41","GET / 返回 Vite SPA；其 assets JS 内含签名算法与 appid/appversion"
-2dland.cn,Portal,官网,"117.21.184.135","GET / 返回“清真云”首页"
-sentry.qiecdn.com,Other,App 冷启动错误上报,116.136.159.35,"App 启动时 TLS SNI 抓取 + 实际连接"
